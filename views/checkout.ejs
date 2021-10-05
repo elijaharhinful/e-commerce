@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<%- include('partials/head'); %>
+
+<body class="main-layout">
+    <%- include('layouts/header'); %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Check Out</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/products">Shop</a>
+                            <a href="/cart/my_cart">My Cart</a>
+                            <span>Check Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container">
+            <div class="checkout__form">
+                <form id="paymentForm" method="POST" action="/cart/checkout">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-6">
+                            <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
+                            here</a> to enter your code</h6>
+                            <h6 class="checkout__title">Billing Details</h6>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Fist Name<span>*</span></p>
+                                        <input name="first-name" type="text" required>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Last Name<span>*</span></p>
+                                        <input name="last-name" type="text" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Country<span>*</span></p>
+                                <input name="country" type="text" required>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Address<span>*</span></p>
+                                <input name="address" type="text" placeholder="Street Address" class="checkout__input__add" required>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Town/City<span>*</span></p>
+                                <input name="town" type="text" required>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Postcode / ZIP<span>*</span></p>
+                                <input name="postcode" type="text" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Phone<span>*</span></p>
+                                        <input name="phone" type="text" required>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Email<span>*</span></p>
+                                        <input name="email" type="text" id="email-address" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="checkout__input">
+                                <p>Order notes/ Reference<span>*</span></p>
+                                <input name="ref" type="text"
+                                placeholder="Notes about your order, e.g. special notes for delivery." required>
+                            </div>
+                        </div>
+                        <% if (typeof cart !== "undefined") { %>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="checkout__order">
+                                <h4 class="order__title">Your order</h4>
+                                <div class="checkout__order__products">Product <span>Total</span></div>
+                                <% let total = 0 %>
+                                <% let sub_total = 0 %>
+                                <% let delivery = 5.00 %>
+                                <ol class="checkout__total__products">
+                                    <% cart.forEach(function(product,index){ %> 
+                                        <% let ind_pdt_total = 0 %>
+
+                                        <% let index_increase = index + 1 %>
+                                        <% let multiply = parseFloat(product.qty * product.price).toFixed(2) %>
+                                        <% ind_pdt_total += +multiply %>
+
+                                        <% sub_total += +ind_pdt_total %>
+                                        <li><%= index_increase %>. <%= product.title %><span>₵ <%= ind_pdt_total %></span></li> 
+                                    <%})%>
+                                </ol>
+                                <ul class="checkout__total__all">
+                                    <li>Subtotal <span>₵<%= parseFloat(sub_total).toFixed(2) %></span></li>
+                                    <li>Delivery Fee <span>₵ 5.00</span></li>
+
+                                    <% total = parseFloat(sub_total + delivery).toFixed(2) %>
+                                    <li id="amount" >Total <span>₵<%= parseFloat(total).toFixed(2) %></span></li>
+                                </ul>
+                                
+                                
+                                <div class="checkout__input__checkbox">
+                                    <label for="paypal">
+                                        Paypal
+                                        <input type="checkbox" id="paypal">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="checkout__input">
+                                    <input name="total" type="text" value="<%= total %>" placeholder="Total" required>
+                                </div>
+                                <button type="submit" class="site-btn" >PLACE ORDER</button>
+
+                            </div>
+                        </div>
+                        <% }else{ %> 
+                            <div class="col-lg-4 col-md-6">
+                                <div class="checkout__order">
+                                    <h5> Add items to your cart to checkout</h5>
+                                </div>
+                            </div>
+                        <%} %>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Checkout Section End -->
+    <!-- <script src="https://js.paystack.co/v1/inline.js">
+    
+    /*------------------
+        PAystack Integration
+    --------------------*/
+    const paymentForm = document.getElementById('paymentForm');
+    paymentForm.addEventListener("submit", payWithPaystack, false);
+
+    function payWithPaystack(e) {
+        e.preventDefault();
+        alert('working');
+        let handler = PaystackPop.setup({
+            key: 'pk_test_d0509bf6287860b8ecce4fb62bcaa9bd34be997b', // Replace with your public key
+            email: document.getElementById("email-address").value,
+            amount: document.getElementById("amount").value * 100,
+            ref: '' + Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+            // label: "Optional string that replaces customer email"
+            onClose: function () {
+                alert('Window closed.');
+            },
+            callback: function (response) {
+                let message = 'Payment complete! Reference: ' + response.reference;
+                alert(message);
+            }
+        });
+        handler.openIframe();
+    }
+    </script>  -->
+
+
+    <%- include('layouts/footer'); %>
+</body>
+
+</html>

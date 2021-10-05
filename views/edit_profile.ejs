@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<%- include('partials/head'); %>
+
+<body class="main-layout">
+    <%- include('layouts/header'); %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Edit Profile</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/users/profile">Profile</a>
+                            <span>Edit Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <br>
+    <br>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="contact__form profile__form">
+                        <br>
+                        <form method="post" action="/users/edit_profile/<%= user.id %>">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <input type="text" name="name" class="form-control" placeholder="Name" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <input type="text" name="email" class="form-control" placeholder="Email" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <input type="tel" name="number" class="form-control" placeholder="Phone Number (Example: 0241230402)" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <input type="address" name="address" class="form-control" placeholder="Billing Address" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <button type="submit" class="site-btn">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    
+                        <br>
+                        <div class="contact__form password__form">
+                            <br>
+                            <h5>Use this form to change your password</h5>
+                            <br>
+                            <form method="post" action="/users/password/<%= user.id %>">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <input type="password" name="password" class="form-control" placeholder="Old Password" required>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <input type="password" name="password1" class="form-control" placeholder="New Password" required>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <input type="password" name="password2" class="form-control" placeholder="Confirm New Password" required>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <button type="submit" class="site-btn">Change Password</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <br><br>
+                        <div class="cart__total">
+                            <h6><b>Billing Address</b></h6>
+                            <p><i><%= user.address %></i></p>
+                        </div>
+                </div>
+            </div>
+            <div class="contact__form">
+                <br>
+                
+            </div>
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <%- include('layouts/footer'); %>
+</body>
+
+</html>

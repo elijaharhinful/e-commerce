@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<%- include('../partials/adminhead'); %>
+
+<body class="main-layout">
+    <%- include('../layouts/adminheader') %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>List of Pages</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/admin/pages/add-page">Add Pages</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <br>
+    <br>
+    
+    <section>
+        <div class="container">
+            
+            
+                <a href="/admin/pages/add-page" class="btn btn-primary">Add a new page</a>
+                <br><br>
+                <h2>Pages</h2>
+                <br>
+                <table class="table table-striped sorting">
+
+                    <thead>
+                        <tr class="home">
+                            <th>Title</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% pages.forEach(function(page){ %>
+                        <tr id="id_<%= page._id %>" class="<%= page.slug %>">
+                            <td><%= page.title %></td>
+                            <td><a href="/admin/pages/edit-page/<%= page._id %>">Edit</a></td>
+                            <% if (page.slug == "home") { %>
+                            <td></td>
+                            <% }  else {%>
+                            <td><a class="confirmDeletion" href="/admin/pages/delete-page/<%= page._id %>">Delete</a></td>
+                            <% }%>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+           
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <%- include('../layouts/adminfooter') %>
+    <script>
+        $('tbody').sortable({
+
+            items: "tr:not('.home')",
+            placeholder: "ui-state-hightlight",
+            update: function () {
+                var ids = $('tbody').sortable("serialize");
+                var url = "/admin/pages/reorder-pages";
+
+                $.post(url, ids);
+            }
+
+        });
+    </script>
+</body>
+
+</html>

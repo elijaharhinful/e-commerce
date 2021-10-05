@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<%- include('partials/head'); %>
+
+<body class="main-layout">
+    <%- include('layouts/header'); %>
+    <!-- Shop Details Section Begin -->
+    <section class="shop-details">
+        <div class="product__details__pic">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product__details__breadcrumb">
+                            <a href="/">Home</a>
+                            <a href="/products">Shop</a>
+                            <span>Product Details</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-3">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <% galleryImages.forEach(function(image,index){ %>
+                            <% if (image != "thumbs") { %>
+                            <% let tab_href = tab_href_array[index] %>
+                            <% if (index == 0){ %> 
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="<%= tab_href %>" role="tab" aria-selected="true">
+                                        <div class="product__thumb__pic set-bg"
+                                            data-setbg="/product_images/<%= p.id %>/gallery/<%= image %>">
+                                        </div>
+                                    </a>
+                                </li>
+                                <% } else{ %> 
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="<%= tab_href %>" role="tab" aria-selected="false">
+                                            <div class="product__thumb__pic set-bg"
+                                                data-setbg="/product_images/<%= p.id %>/gallery/<%= image %>">
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <%} %>
+                            
+                            <% } %>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6 col-md-9">
+                        <div class="tab-content">
+                            <% galleryImages.forEach(function(image,index){ %>
+                                <% if (image != "thumbs") { %>
+                                <% let tab_id = tab_id_array[index] %>
+                                <% if (index == 0){ %> 
+                                    <div class="tab-pane active" id="<%= tab_id %>" role="tabpanel">
+                                        <div class="product__details__pic__item">
+                                            <img src="/product_images/<%= p.id %>/gallery/thumbs/<%= image %>" alt="">
+                                        </div>
+                                    </div>
+                                    <% } else{ %> 
+                                        <div class="tab-pane" id="<%= tab_id %>" role="tabpanel">
+                                            <div class="product__details__pic__item">
+                                                <img src="/product_images/<%= p.id %>/gallery/thumbs/<%= image %>" alt="">
+                                            </div>
+                                        </div>
+                                        <%} %>
+                                <% } %>
+                                <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="product__details__content">
+            <div class="container">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="product__details__text">
+                            <h4><%=p.title  %></h4>
+                            <h3>₵<%= parseFloat(p.price).toFixed(2) %><span>70.00</span></h3>
+                            <p><%= p.desc %></p>
+
+                            <div class="product__details__cart__option">
+                                <% if (loggedIn) { %>
+                                    <p><a href="/cart/add/<%= p.slug %>" class="primary-btn">Add to cart</a></p>
+                                    <% } else {%>
+                                    <a class="primary-btn" style="color: red;" href="/users/login">You must be logged in to purchase items</a>
+                                    <% } %>
+                            </div>
+                            <div class="product__details__last__option">
+                                <h5><span>Guaranteed Safe Checkout</span></h5>
+                                <img src="img/shop-details/details-payment.png" alt="">
+                                <ul>
+                                    <li><span>Categories:</span> <%= c_title %></li>
+                                    <li><span>Tag:</span> <%= c_title %></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product__details__tab">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#tabs-5"
+                                        role="tab">Description</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="tabs-5" role="tabpanel">
+                                    <div class="product__details__tab__content text-center">
+                                        <p class="note"><%= p.desc %></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Details Section End -->
+
+    <!-- Related Section Begin -->
+    <section class="related spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="related-title">Related Products</h3>
+                </div>
+            </div>
+            <div class="row">
+                <% products.forEach(function(p,index){ %>
+                    <% if(index <= 3){ %>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
+                            <div class="product__item">
+                                <div class="product__item__pic set-bg" data-setbg="/product_images/<%= p.id %>/<%= p.image %>">
+                                    <ul class="product__hover">
+                                        <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
+                                        <li><a class="vd" href="/products/<%= p.category %>/<%= p.slug %>"><img src="img/icon/compare.png" alt=""> <span>View Details</span></a>
+                                        </li>
+                                        <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
+                                    </ul>
+                                </div>
+                                <div class="product__item__text">
+                                    <h6><%= p.title %></h6>
+                                    <a href="#" class="add-cart">+ Add To Cart</a>
+                                    <h5>₵<%= parseFloat(p.price).toFixed(2) %></h5>
+                                </div>
+                                <div class="product__item">
+                                    <a class="vd primary-btn" href="/products/<%= p.category %>/<%= p.slug %>">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                
+                <% }); %>
+            </div>
+            
+        </div>
+    </section>
+    <!-- Related Section End -->
+
+    <%- include('layouts/footer'); %>
+</body>
+
+</html>

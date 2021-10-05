@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<%- include('partials/head'); %>
+
+<body class="main-layout">
+    <%- include('layouts/header'); %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Verify Account</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <span>Verify Account</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <br>
+    <br>
+    <section>
+        <div class="container">
+            
+
+            <div >
+                <br>
+                <div class="card bg-light">
+                    <div class="card-header text-center">
+                        <h4>Verification link sent to your email!</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5>Check your email for a verification link and follow the instruction in the mail!</h5>
+                        <br>
+                        <br>
+                        <h6>Didn't receive any verification link?</h6>
+                        <br>
+                        <br>
+                        <a href="/users/token-resend" class="primary-btn">Click here to resend verification link</a>
+                        <br>
+                        <br>
+                        <h6><i>Token expires in an hour</i></h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <%- include('layouts/footer'); %>
+</body>
+
+</html>

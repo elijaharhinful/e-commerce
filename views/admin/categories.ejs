@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<%- include('../partials/adminhead'); %>
+
+<body class="main-layout">
+    <%- include('../layouts/adminheader') %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Categories</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/admin/categories/add-category">Add category</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <br>
+    <br>
+    
+    <section>
+        <div class="container">
+            
+           
+                <a href="/admin/categories/add-category" class="btn btn-primary">Add a new category</a>
+            <br><br>
+                <h2>List of Categories</h2>
+                <br>
+                <table class="table table-striped">
+
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% categories.forEach(function(cat){ %>
+                        <tr>
+                            <td><%= cat.title %></td>
+                            <td><a href="/admin/categories/edit-category/<%= cat._id %>">Edit</a></td>
+                            <td><a class="confirmDeletion" href="/admin/categories/delete-category/<%= cat._id %>">Delete</a></td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+           
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <%- include('../layouts/adminfooter') %>
+</body>
+
+</html>

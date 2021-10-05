@@ -1,0 +1,23 @@
+<header>
+    <nav class="header__menu mobile-menu">
+        <ul>
+            <li class="active"><a href="/">My website</a></li>
+            <li><a class="nav-link " data-value="pages" href="/admin/pages">Pages</a></li>
+            <li><a class="nav-link " data-value="categories" href="/admin/categories">Categories</a></li>
+            <li><a class="nav-link " data-value="products" href="/admin/products">Products</a></li>
+            <li><a class="nav-link " data-value="logout" href="/users/logout">Logout</a></li>
+        </ul>
+    </nav>
+   
+    <div class="container">
+        <%- messages('messages', locals) %>
+
+        <% if (errors) {%>
+            <% errors.forEach(function(error) { %>
+            <div class="alert alert-danger">
+                <%= error.msg %>
+            </div>
+            <% });%>
+        <% }%>
+    </div>
+</header>

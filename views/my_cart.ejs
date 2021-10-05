@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<%- include('partials/head'); %>
+
+<body class="main-layout">
+    <%- include('layouts/header'); %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4><%= title %></h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/products">Shop</a>
+                            <span><%= title %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <section class="shopping-cart spad">
+        <div class="container">
+            <div class="row">
+                
+                    <% if (typeof cart !== "undefined") { %>
+                        <div class="col-lg-8">
+                            <div class="shopping__cart__table">
+                                <table class="table table-striped alignmiddle">
+
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Title</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th></th>
+                                        <th>Subtotal</th>
+                                    </tr>
+
+                                    <% let total = 0; %>
+                                    <% cart.forEach(function(product){ %>
+                                    <% let sub = parseFloat(product.qty * product.price).toFixed(2) %>
+                                    <% total += +sub %>
+                                    <tr>
+                                        <td><img class="cpi" src="<%= product.image %>" alt=""></td>
+                                        <td><%= product.title %></td>
+                                        <td>₵<%= product.price %></td>
+                                        <td><%= product.qty %></td>
+                                        <td>
+                                            <a href="/cart/update/<%= product.title %>?action=add"><i class="fa fa-plus"></i></a>&nbsp;
+                                            <a href="/cart/update/<%= product.title %>?action=remove"><i class="fa fa-minus"></i></a>&nbsp;
+                                            <a href="/cart/update/<%= product.title %>?action=clear"><i class="fa fa-times"></i></a>&nbsp;
+                                        </td>
+                                        <td>₵<%= sub %></td>
+                                    </tr>
+                                    <% }); %>
+                                    <tr>
+                                        <td colspan="7" align="right"><b>Total: </b> ₵<%= parseFloat(total).toFixed(2) %>
+                                        </td>
+                                    </tr>
+                                  
+
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="continue__btn" >
+                                        <a href="/products" style="background-color: bisque;">Continue Shopping</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="continue__btn update__btn">
+                                        <a class="clearcart" href="/cart/clear">Clear cart</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="cart__discount">
+                                <h6>Discount codes</h6>
+                                <form action="#">
+                                    <input type="text" placeholder="Coupon code">
+                                    <button type="submit">Apply</button>
+                                </form>
+                            </div>
+                            <div class="cart__total">
+                                <h6>Cart total</h6>
+                                <ul>
+                                    <li>Total <span>₵<%= parseFloat(total).toFixed(2) %></span></li>
+                                </ul>
+                                <% if (user) { %>
+                                    <a class="btn primary-btn" href="/cart/checkout">Proceed to checkout</a>
+                                    <% }else {%>
+                                        <br>
+                                        <a class="btn primary-btn" href="/users/login">Login to buy items</a>
+                                        <% }%>
+                            </div>
+                        </div>
+                    <% } else {%>
+                        <div class="col-sm-12">
+                            <h3 class="text-center">Your cart is empty.</h3>
+                        </div>
+                        <br>
+                        <br>
+                        <div class="col-sm-12 text-center">
+                            <a class="btn primary-btn" href="/products">Add items to cart</a>
+                        </div>
+                        
+                        
+                    <% } %>
+            </div>
+                        
+                
+                
+            </div>
+        </div>
+        
+        
+    </section>
+    <script>
+    
+        $(function() {
+           
+            $('a.clearcart').on('click', function () {
+                if (!confirm('Confirm clear cart'))
+                    return false;
+            });
+            
+            $('a.buynow').on('click', function (e) {
+                e.preventDefault();
+                
+                $.get('/cart/buynow', function() {
+                    $('form.pp input[type=image]').click();
+                    $('.ajaxbg').show();
+                });
+            });
+                
+        });
+            
+        </script>
+
+    <%- include('layouts/footer'); %>
+</body>
+
+</html>

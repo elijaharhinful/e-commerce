@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<%- include('partials/head'); %>
+
+<body class="main-layout">
+    <%- include('layouts/header'); %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Enter Token</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/users/login">Login</a>
+                            <span>Enter Token</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <br>
+    <br>
+    <section>
+        <div class="container">
+            
+
+            <div class="contact__form">
+                <h2>Enter token you received via email</h2>
+                <br>
+                
+                <form method="post" action="/users/token">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <input type="text" name="token" class="form-control" placeholder="Enter Token"  required>
+                        </div>
+                        <div class="col-lg-12">
+                            <button type="submit" class="site-btn">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <%- include('layouts/footer'); %>
+</body>
+
+</html>

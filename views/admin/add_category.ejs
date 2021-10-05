@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<%- include('../partials/adminhead'); %>
+
+<body class="main-layout">
+    <%- include('../layouts/adminheader') %>
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Add a Product</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/admin/categories">Categories</a>
+                            <span>Add a category</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+    <br>
+    <br>
+    
+    <section>
+        <div class="container">
+            
+            <div class="contact__form">
+                <a href="/admin/categories" class="btn btn-primary">Back to all categories</a>
+            <br><br>
+                <h2>Add New Category</h2>
+                <br>
+                <form method="post" action="/admin/categories/add-category">
+    
+                    <div class="form-group">
+                        <label for="">Title</label>
+                        <input type="text" class="form-control" name="title" value="<%= title %>" placeholder="Title">
+                    </div>
+                    
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <br>
+    <br>
+
+    <%- include('../layouts/adminfooter') %>
+</body>
+
+</html>

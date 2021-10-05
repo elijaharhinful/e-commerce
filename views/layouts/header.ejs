@@ -1,0 +1,70 @@
+<header class="header">
+    <div class="ajaxbg">
+        <div class="ajaxinner">
+            <h3>You are now being redirected to paypal...</h3>
+            <img src="\img\ajax-loader.gif" alt="" />
+        </div>
+    </div>
+
+    <div class="container" >
+        <div class="row">
+            <div class="col-lg-3 col-md-3">
+                <div class="header__logo">
+                    <a href="/"><img src="img/logo.png" alt=""></a>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-9">
+                <nav class="header__menu mobile-menu">
+                    <ul>
+                        <% pages.forEach(function(page){ %>
+                        <% if (page.slug == "home") { %>
+                        <li class="active"><a href="/"><%- page.title %></a></li>
+                        <% } else {%>
+                        <li><a href="/<%= page.slug %>"><%= page.title %></a></li>
+                        <% } %>
+                        <% }); %>
+                        
+                        <li><a href="/products">Shop</a></li>
+                        <li>
+                            <a href="/cart/my_cart">My Cart (
+                                <% if (typeof cart !== "undefined") { %>
+                                <%= cart.length %>
+                                <% } else {%>
+                                0
+                                <% } %>
+                                )</a>
+                        </li>
+                        <% if (user) { %>
+                            <li><a href="#">Hi, <%= user.username %><span><i class="arrow_carrot-down"></i></span></a>
+                                <ul class="dropdown">
+                                    <li><a href="/users/<%= user.id %>/">Profile</a></li>
+                                    <li><a href="/users/logout">Logout</a></li>
+                                </ul>
+                            </li>
+                            <% } else {%>
+                        <li><a href="/users/register">Register</a></li>
+                        <li><a href="/users/login">Log in</a></li>
+                        <% } %>
+                        <% if (user && user.admin == 1) { %>
+                        <li><a href="/admin/pages">Admin Area</a></li>
+                        <% }%>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="canvas__open"><i class="fa fa-bars"></i></div>
+    </div>
+    <div class="container">
+        <%- messages('messages', locals) %>
+
+        <% if (errors) {%>
+            <% errors.forEach(function(error) { %>
+            <div class="alert alert-danger">
+                <%= error.msg %>
+            </div>
+            <% });%>
+        <% }%>
+    </div>
+    
+</header>
