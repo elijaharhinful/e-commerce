@@ -3271,6 +3271,14 @@ ol {
     margin: auto;
 }
 
+.contact__form .forgot__pass{
+	color: red;
+}
+
+.contact__form .forgot__pass:hover{
+	color: blue;
+}
+
 .profile__form{
     width: 80% !important;
     margin: auto;
@@ -3904,11 +3912,11 @@ table.alignmiddle td {
     vertical-align: middle !important;
 }
 
-.pp {
+/* .pp {
     position: absolute;
     left: -3000px;
-}
-
+} */
+/* 
 .ajaxbg {
     position: absolute;
     width: 100%;
@@ -3924,7 +3932,7 @@ table.alignmiddle td {
     top: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-}
+} */
 
 .alert-error {
     color: #a94442;

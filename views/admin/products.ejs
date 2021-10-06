@@ -29,44 +29,49 @@
             <h2 class="page-title">List of Products</h2>
             <a href="/admin/products/add-product" class="btn btn-primary">Add a new product</a>
             <br><br>
+            <div class="row">
+                <div class="col-sm-12">
+                    <% if (count > 0) { %>
 
-            <% if (count > 0) { %>
+                        <table class="table table-striped alignmiddle">
+            
+                            <thead>
+                                <tr class="home">
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Category</th>
+                                    <th>Product Image</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% products.forEach(function(product){ %>
+                                <tr>
+                                    <td><%= product.title %></td>
+                                    <td>₵<%= parseFloat(product.price).toFixed(2) %></td>
+                                    <td><%= product.category %></td>
+                                    <td>
+                                        <% if (product.image == "") { %>
+                                        <img id="noimage" src="/img/noimage.png">
+                                        <% } else {%>
+                                        <img id="noimage" src="/product_images/<%= product._id %>/<%= product.image %>">
+                                        <% }%>
+                                    </td>
+                                    <td><a href="/admin/products/edit-product/<%= product._id %>">Edit</a></td>
+                                    <td><a class="confirmDeletion" href="/admin/products/delete-product/<%= product._id %>" > Delete</a></td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+            
+                        <% } else {%>
+                        <h3 class="text-center">There are no products.</h3>
+                        <% }%>
+                </div>
+            </div>
 
-            <table class="table table-striped alignmiddle">
-
-                <thead>
-                    <tr class="home">
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Category</th>
-                        <th>Product Image</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% products.forEach(function(product){ %>
-                    <tr>
-                        <td><%= product.title %></td>
-                        <td>₵<%= parseFloat(product.price).toFixed(2) %></td>
-                        <td><%= product.category %></td>
-                        <td>
-                            <% if (product.image == "") { %>
-                            <img id="noimage" src="/img/noimage.png">
-                            <% } else {%>
-                            <img id="noimage" src="/product_images/<%= product._id %>/<%= product.image %>">
-                            <% }%>
-                        </td>
-                        <td><a href="/admin/products/edit-product/<%= product._id %>">Edit</a></td>
-                        <td><a class="confirmDeletion" href="/admin/products/delete-product/<%= product._id %>" > Delete</a></td>
-                    </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-
-            <% } else {%>
-            <h3 class="text-center">There are no products.</h3>
-            <% }%>
+            
         </div>
     </section>
     <br>

@@ -129,13 +129,13 @@ app.get('*', function(req,res,next) {
 });
 
 // Set routes 
-let pages = require('./routes/pages.js');
-let products = require('./routes/products.js');
-let cart = require('./routes/cart.js');
-let users = require('./routes/users.js');
-let adminPages = require('./routes/admin_pages.js');
-let adminCategories = require('./routes/admin_categories.js');
-let adminProducts = require('./routes/admin_products.js');
+const pages = require('./routes/pages.js');
+const products = require('./routes/products.js');
+const cart = require('./routes/cart.js');
+const users = require('./routes/users.js');
+const adminPages = require('./routes/admin_pages.js');
+const adminCategories = require('./routes/admin_categories.js');
+const adminProducts = require('./routes/admin_products.js');
 
 app.use('/admin/pages', adminPages);
 app.use('/admin/categories', adminCategories);
@@ -157,7 +157,7 @@ app.use(function (err, req, res, next) {
 });
 
 //start the server
-let port = 3000;
+let port = process.env.PORT || 3000;
 app.listen(port, function () {
   console.log('App is running on http://localhost:' + port);
 });

@@ -14,19 +14,19 @@ const Category = require('../models/category');
  * GET all products
  */
 router.get('/', function (req, res) {
+    async function main() {
+        await Product.find(function (err, products) {
+            if (err)
+                console.log(err);
 
-    Product.find(function (err, products) {
-        if (err)
-            console.log(err);
-
-        res.render('all_products', {
-            title: 'All products',
-            products: products
+            res.render('all_products', {
+                title: 'All products',
+                products: products
+            });
         });
-    });
-
+    }
+    main().catch(console.error);
 });
-
 
 /*
  * GET products by category
@@ -35,9 +35,7 @@ router.get('/:category', function (req, res) {
 
     let categorySlug = req.params.category;
 
-    Category.findOne({
-        slug: categorySlug
-    }, function (err, c) {
+    Category.findOne({slug: categorySlug}, function (err, c) {
         Product.find({
             category: categorySlug
         }, function (err, products) {
