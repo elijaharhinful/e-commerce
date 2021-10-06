@@ -28,7 +28,7 @@ router.get('/', function (req, res) {
                 console.log(err);
 
             res.render('index', {
-                title: "Home",
+                title: page.title,
                 content: page.content,
                 products: products
             });
