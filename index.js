@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -6,21 +7,25 @@ const session = require('express-session')
 const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
-require('dotenv').config();
 
 
 //conect to database
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect(process.env.MONGODB_URL || config.database, {useNewUrlParser: true})
-
-  if (process.env.MONGODB_URL) {
-    console.log('Connected to MongoDB atlas')
-  } else {
+  if (process.env.NODE_ENV === "development") {
+    await mongoose.connect(config.database)
     console.log('Connected to MongoDB local')
-  };
+  } else {
+    await mongoose.connect(process.env.MONGODB_URL, {
+      useNewUrlParser: true
+    })
+
+    console.log('Connected to MongoDB atlas')
+  }
 }
+  
+
 
 //init app
 let app = express();
