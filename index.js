@@ -157,8 +157,8 @@ app.use(function (err, req, res, next) {
 });
 
 //start the server
-let port = process.env.PORT || 3000;
-app.listen(port, function () {
-  console.log('App is running on http://localhost:' + port);
+let PORT = process.env.PORT || 3000;
+app.listen(PORT, function () {
+  console.log('App is running on http://localhost:' + PORT);
 });
 ``
