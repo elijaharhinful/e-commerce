@@ -6,16 +6,22 @@ const session = require('express-session')
 const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
-const async = require('async');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+require('dotenv').config();
+
 
 //conect to database
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect(config.database);
-  console.log('Connected to MongoDB')
+  await mongoose.connect(process.env.MONGODB_URL || config.database, {
+    useNewUrlParser: true,
+  })
+
+  if (process.env.MONGODB_URL) {
+    console.log('Connected to MongoDB atlas')
+  } else {
+    console.log('Connected to MongoDB local')
+  };
 }
 
 //init app
