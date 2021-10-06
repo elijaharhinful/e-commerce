@@ -7,7 +7,7 @@ const session = require('express-session')
 const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
-
+const MongoStore = require('connect-mongo');
 
 //conect to database
 main().catch(err => console.log(err));
@@ -74,12 +74,24 @@ app.use(express.urlencoded({ extended: false}))
 app.use(express.json());
 
 // Express Session middleware
-app.use(session({
-  secret: 'keyboard cat',
-  resave: true,
-  saveUninitialized: true
-  //  cookie: { secure: true }
-}));
+if (process.env.NODE_ENV === "development"){
+  app.use(session({
+    secret: 'keyboard cat',
+    resave: true,
+    saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: config.database
+    })
+    //  cookie: { secure: true }
+  }));
+}else{
+  app.use(session({
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URL
+    })
+  }));
+}
+
 
 // Express Validator middleware
 app.use(expressValidator({
@@ -145,6 +157,7 @@ const users = require('./routes/users.js');
 const adminPages = require('./routes/admin_pages.js');
 const adminCategories = require('./routes/admin_categories.js');
 const adminProducts = require('./routes/admin_products.js');
+const database = require('./config/database');
 
 app.use('/admin/pages', adminPages);
 app.use('/admin/categories', adminCategories);
