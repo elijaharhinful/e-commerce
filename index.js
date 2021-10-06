@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const config = require('./config/database')
-const session = require('cookie-session')
+const session = require('express-session')
 const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
@@ -12,27 +12,18 @@ const MongoStore = require('connect-mongo');
 //conect to database
 main().catch(err => console.log(err));
 
-// async function main() {
-//   if (process.env.NODE_ENV === "development") {
-//     await mongoose.connect(config.database)
-//     console.log('Connected to MongoDB local')
-//   } else if (process.env.NODE_ENV === "production") {
-//     await mongoose.connect(process.env.MONGODB_URL, {
-//       useNewUrlParser: true
-//     })
-
-//     console.log('Connected to MongoDB atlas')
-//   }
-// }
-
 async function main() {
-  await mongoose.connect(process.env.MONGODB_URL, {
+  if (process.env.NODE_ENV === "development") {
+    await mongoose.connect(config.database)
+    console.log('Connected to MongoDB local')
+  } else if (process.env.NODE_ENV === "production") {
+    await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true
     })
 
     console.log('Connected to MongoDB atlas')
   }
-
+}
   
 
 
