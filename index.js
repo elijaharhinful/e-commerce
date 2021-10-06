@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const config = require('./config/database')
-const session = require('express-session')
+const session = require('cookie-session')
 const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
@@ -16,7 +16,7 @@ async function main() {
   if (process.env.NODE_ENV === "development") {
     await mongoose.connect(config.database)
     console.log('Connected to MongoDB local')
-  } else {
+  } else if (process.env.NODE_ENV === "production") {
     await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true
     })
@@ -79,15 +79,17 @@ if (process.env.NODE_ENV === "development"){
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: true,
-    store: MongoStore.create({
-      mongoUrl: config.database
+    store: new MongoStore({
+      mongoUrl: config.database,
+      ttl: 5 * 24 * 60 * 60 // = 5 days.
     })
     //  cookie: { secure: true }
   }));
-}else{
+}else if (process.env.NODE_ENV === "production"){
   app.use(session({
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL
+      mongoUrl: process.env.MONGODB_URL,
+      ttl: 5 * 24 * 60 * 60 // = 5 days.
     })
   }));
 }
@@ -179,8 +181,9 @@ app.use(function (err, req, res, next) {
 });
 
 //start the server
+
 let PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {
-  console.log('App is running on http://localhost:' + PORT);
+  console.log('App is running on http://localhost: ' + PORT);
 });
 ``
