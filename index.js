@@ -12,15 +12,20 @@ const MongoStore = require('connect-mongo');
 //conect to database
 main().catch(err => console.log(err));
 
-async function main() {
-  if (process.env.NODE_ENV === "development") {
-    await mongoose.connect(config.database)
-    console.log('Connected to MongoDB local')
+// async function main() {
+//   if (process.env.NODE_ENV === "development") {
+//     await mongoose.connect(config.database)
+//     console.log('Connected to MongoDB local')
 
-  } else if (process.env.NODE_ENV === "production") {
-    await mongoose.connect(process.env.MONGODB_URL)
-    console.log('Connected to MongoDB atlas')
-  }
+//   } else if (process.env.NODE_ENV === "production") {
+//     await mongoose.connect(process.env.MONGODB_URL)
+//     console.log('Connected to MongoDB atlas')
+//   }
+// }
+
+async function main() {
+  await mongoose.connect(process.env.MONGODB_URL)
+  console.log('Connected to MongoDB atlas');
 }
   
 
@@ -74,7 +79,7 @@ app.use(express.json());
 // Express Session middleware
 if (process.env.NODE_ENV === "development"){
   app.use(session({
-    secret: 'keyboard cat',
+    secret: process.env.SESS_KEY,
     resave: true,
     saveUninitialized: true,
     store: new MongoStore({
@@ -85,6 +90,9 @@ if (process.env.NODE_ENV === "development"){
   }));
 }else if (process.env.NODE_ENV === "production"){
   app.use(session({
+    secret: process.env.SESS_KEY,
+    resave: true,
+    saveUninitialized: true,
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URL,
       ttl: 5 * 24 * 60 * 60 // = 5 days.
