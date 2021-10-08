@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
@@ -100,8 +101,8 @@ router.post('/register', function (req, res) {
                                                 port: 587,
                                                 secure: false, // true for 465, false for other ports
                                                 auth: {
-                                                    user: 'shakira.kunde99@ethereal.email', // generated ethereal user
-                                                    pass: 'VJGz1QV6AUna475pUW' // generated ethereal password
+                                                    user: process.env.NODEMAILER_USER, // generated ethereal user
+                                                    pass: process.env.NODEMAILER_PASS // generated ethereal password
                                                 },
                                             });
 
@@ -265,8 +266,8 @@ router.post('/token-resend', function (req, res) {
                                 port: 587,
                                 secure: false, // true for 465, false for other ports
                                 auth: {
-                                    user: 'shakira.kunde99@ethereal.email', // generated ethereal user
-                                    pass: 'VJGz1QV6AUna475pUW' // generated ethereal password
+                                    user: process.env.NODEMAILER_USER, // generated ethereal user
+                                    pass: process.env.NODEMAILER_PASS // generated ethereal password
                                 },
                             });
 

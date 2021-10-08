@@ -16,11 +16,9 @@ async function main() {
   if (process.env.NODE_ENV === "development") {
     await mongoose.connect(config.database)
     console.log('Connected to MongoDB local')
-  } else if (process.env.NODE_ENV === "production") {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true
-    })
 
+  } else if (process.env.NODE_ENV === "production") {
+    await mongoose.connect(process.env.MONGODB_URL)
     console.log('Connected to MongoDB atlas')
   }
 }
@@ -184,6 +182,6 @@ app.use(function (err, req, res, next) {
 
 let PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {
-  console.log('App is running on http://localhost: ' + PORT);
+  console.log('App is running on http://localhost:' + PORT);
 });
 ``
