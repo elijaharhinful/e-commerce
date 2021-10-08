@@ -8,6 +8,7 @@ const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
 const MongoStore = require('connect-mongo');
+const cookieParser = require('cookie-parser')
 
 //conect to database
 main().catch(err => console.log(err));
@@ -26,6 +27,7 @@ async function main() {
 
 //init app
 let app = express();
+app.use(cookieParser());
 
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));
