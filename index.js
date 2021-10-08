@@ -8,7 +8,7 @@ const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
 const MongoStore = require('connect-mongo');
-const cookieParser = require('cookie-parser')
+const MemoryStore = require('memorystore')(session)
 
 //conect to database
 main().catch(err => console.log(err));
@@ -27,7 +27,6 @@ async function main() {
 
 //init app
 let app = express();
-app.use(cookieParser());
 
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -73,30 +72,40 @@ app.use(express.urlencoded({ extended: false}))
 app.use(express.json());
 
 // Express Session middleware
-if (process.env.NODE_ENV === "development"){
-  app.use(session({
-    secret: process.env.SESS_KEY,
-    resave: true,
-    saveUninitialized: true,
-    store: MongoStore.create({
-      mongoUrl: config.database,
-      ttl: 5 * 24 * 60 * 60 // = 5 days.
-    })
-    //  cookie: { secure: true }
-  }));
-}else if (process.env.NODE_ENV === "production"){
-  app.set('trust proxy', 1); // trust first proxy
-  app.use(session({
-    secret: process.env.SESS_KEY,
-    resave: true,
-    saveUninitialized: true,
-    cookie: { secure: true },
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL,
-      ttl: 5 * 24 * 60 * 60 // = 5 days.
-    })
-  }));
-}
+// if (process.env.NODE_ENV === "development"){
+//   app.use(session({
+//     secret: process.env.SESS_KEY,
+//     resave: true,
+//     saveUninitialized: true,
+//     store: MongoStore.create({
+//       mongoUrl: config.database,
+//       ttl: 5 * 24 * 60 * 60 // = 5 days.
+//     })
+//     //  cookie: { secure: true }
+//   }));
+// }else if (process.env.NODE_ENV === "production"){
+//   app.set('trust proxy', 1); // trust first proxy
+//   app.use(session({
+//     secret: process.env.SESS_KEY,
+//     resave: true,
+//     saveUninitialized: true,
+//     cookie: { secure: true },
+//     store: MongoStore.create({
+//       mongoUrl: process.env.MONGODB_URL,
+//       ttl: 5 * 24 * 60 * 60 // = 5 days.
+//     })
+//   }));
+// }
+
+app.use(session({
+  cookie: { maxAge: 86400000 },
+  saveUninitialized: true,
+  store: new MemoryStore({
+    checkPeriod: 86400000 // prune expired entries every 24h
+  }),
+  resave: false,
+  secret: 'keyboard cat'
+}))
 
 
 // Express Validator middleware
