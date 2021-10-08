@@ -77,17 +77,19 @@ if (process.env.NODE_ENV === "development"){
     secret: process.env.SESS_KEY,
     resave: true,
     saveUninitialized: true,
-    store: new MongoStore({
+    store: MongoStore.create({
       mongoUrl: config.database,
       ttl: 5 * 24 * 60 * 60 // = 5 days.
     })
     //  cookie: { secure: true }
   }));
 }else if (process.env.NODE_ENV === "production"){
+  app.set('trust proxy', 1); // trust first proxy
   app.use(session({
     secret: process.env.SESS_KEY,
     resave: true,
     saveUninitialized: true,
+    cookie: { secure: true },
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URL,
       ttl: 5 * 24 * 60 * 60 // = 5 days.
