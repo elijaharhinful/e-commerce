@@ -100,6 +100,7 @@ router.post('/register', function (req, res) {
                                                     host: 'smtp.gmail.com',
                                                     port: 465,
                                                     secure: true,
+                                                    SMTPSecure: 'tls',
                                                     service: 'gmail',
                                                     auth: {
                                                         type: 'OAuth2',
@@ -272,6 +273,7 @@ router.post('/token-resend', function (req, res) {
                                     host: 'smtp.gmail.com',
                                     port: 465,
                                     secure: true,
+                                    SMTPSecure: 'tls',
                                     service: 'gmail',
                                     auth: {
                                         type: 'OAuth2',
@@ -416,6 +418,7 @@ router.post('/forgot', function (req, res) {
                                     host: 'smtp.gmail.com',
                                     port: 465,
                                     secure: true,
+                                    SMTPSecure: 'tls',
                                     service: 'gmail',
                                     auth: {
                                         type: 'OAuth2',
@@ -524,6 +527,7 @@ router.post('/forgot-resend', function (req, res) {
                                     host: 'smtp.gmail.com',
                                     port: 465,
                                     secure: true,
+                                    SMTPSecure: 'tls',
                                     service: 'gmail',
                                     auth: {
                                         type: 'OAuth2',
