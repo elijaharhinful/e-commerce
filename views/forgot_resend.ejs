@@ -10,11 +10,10 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb__text">
-                        <h4>Enter Token</h4>
+                        <h4>Resend Password Token</h4>
                         <div class="breadcrumb__links">
                             <a href="/">Home</a>
-                            <a href="/users/login">Login</a>
-                            <span>Enter Token</span>
+                            <span>Resend Password Token</span>
                         </div>
                     </div>
                 </div>
@@ -29,26 +28,16 @@
             
 
             <div class="contact__form">
-                <h2>Enter token you received via email</h2>
+                <h2>Enter your email address to receive token again</h2>
                 <br>
-                
-                <form method="post" action="/users/token">
+                <form method="post" action="/users/forgot-resend">
                     <div class="row">
                         <div class="col-lg-12">
-                            <input type="text" name="token" class="form-control" placeholder="Enter Token"  required>
+                            <input type="text" name="email" class="form-control" placeholder="Email" required>
                         </div>
                         <div class="col-lg-12">
-                            <button type="submit" class="site-btn">Submit</button>
+                            <button type="submit" class="site-btn">Resend Token</button>
                         </div>
-                        <div class="col-lg-12">
-                            <br>
-                        <h6>Didn't receive any email?</h6>
-                        <br>
-                        <a href="/users/forgot-resend" class="primary-btn">Click here to resend token</a>
-                        <br>
-                        <h6><i>Token expires in an hour</i></h6>
-                        </div>
-                        
                     </div>
                 </form>
             </div>
