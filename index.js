@@ -8,7 +8,6 @@ const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
 const MongoStore = require('connect-mongo');
-const MemoryStore = require('memorystore')(session)
 
 //conect to database
 main().catch(err => console.log(err));
@@ -96,16 +95,6 @@ app.use(express.json());
 //     })
 //   }));
 // }
-
-app.use(session({
-  cookie: { maxAge: 86400000 },
-  saveUninitialized: true,
-  store: new MemoryStore({
-    checkPeriod: 86400000 // prune expired entries every 24h
-  }),
-  resave: false,
-  secret: 'keyboard cat'
-}))
 
 
 // Express Validator middleware
