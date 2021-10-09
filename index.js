@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const config = require('./config/database')
-const session = require('express-session')
+//const session = require('express-session')
 const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
@@ -70,31 +70,7 @@ app.use(fileUpload());
 app.use(express.urlencoded({ extended: false}))
 app.use(express.json());
 
-// Express Session middleware
-// if (process.env.NODE_ENV === "development"){
-//   app.use(session({
-//     secret: process.env.SESS_KEY,
-//     resave: true,
-//     saveUninitialized: true,
-//     store: MongoStore.create({
-//       mongoUrl: config.database,
-//       ttl: 5 * 24 * 60 * 60 // = 5 days.
-//     })
-//     //  cookie: { secure: true }
-//   }));
-// }else if (process.env.NODE_ENV === "production"){
-//   app.set('trust proxy', 1); // trust first proxy
-//   app.use(session({
-//     secret: process.env.SESS_KEY,
-//     resave: true,
-//     saveUninitialized: true,
-//     cookie: { secure: true },
-//     store: MongoStore.create({
-//       mongoUrl: process.env.MONGODB_URL,
-//       ttl: 5 * 24 * 60 * 60 // = 5 days.
-//     })
-//   }));
-// }
+// 
 
 
 // Express Validator middleware
