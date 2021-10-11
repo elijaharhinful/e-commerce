@@ -28,6 +28,10 @@ let UserSchema = mongoose.Schema({
     admin: {
         type: Number
     },
+    date :{
+        type : Date,
+        default : Date.now
+    },
     isVerified : {
         type: Boolean,
         default : false

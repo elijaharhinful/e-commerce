@@ -91,7 +91,7 @@ if (process.env.NODE_ENV === "development"){
     cookie: { secure: true },
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URL,
-      ttl: 5 * 24 * 60 * 60 // = 5 days.
+      ttl: 1 * 24 * 60 * 60 // = 1 day.
     })
   }));
 }
@@ -150,6 +150,7 @@ app.use(passport.session());
 app.get('*', function(req,res,next) {
   res.locals.cart = req.session.cart;
   res.locals.user = req.user || null;
+  console.log(res.locals.user)
   next();
 });
 
