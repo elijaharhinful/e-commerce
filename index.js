@@ -86,7 +86,7 @@ if (process.env.NODE_ENV === "development"){
   app.set('trust proxy', 1); // trust first proxy
   app.use(session({
     secret: process.env.SESS_KEY,
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: { secure: true },
     store: MongoStore.create({
