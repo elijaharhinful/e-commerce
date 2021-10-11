@@ -104,7 +104,8 @@ router.post('/checkout', function (req, res) {
         "amount": req.body.total * 100,
         "currency": "GHS",
         "reference": new_ref,
-        "channels": ['card', 'mobile_money']
+        "channels": ['card', 'mobile_money'],
+        "callback_url": 'https://elisales.herokuapp.com/cart/payment-complete'
     })
 
     let options = {
@@ -117,7 +118,6 @@ router.post('/checkout', function (req, res) {
 
     axios.post('https://api.paystack.co/transaction/initialize', params, options)
         .then(function (response) {
-            console.log(response.data.data);
             res.redirect(response.data.data.authorization_url)
         })
         .catch(function (error) {
@@ -179,11 +179,12 @@ router.get('/clear', function (req, res) {
 /*
  * GET buy now
  */
-router.get('/buynow', function (req, res) {
+router.get('/payment-complete', function (req, res) {
 
-    delete req.session.cart;
-    
-    res.sendStatus(200);
+    res.render('payment_complete',{
+        user : null,
+        title : "Payment Complete"
+    });
 
 });
 

@@ -86,7 +86,7 @@ if (process.env.NODE_ENV === "development"){
   app.set('trust proxy', 1); // trust first proxy
   app.use(session({
     secret: process.env.SESS_KEY,
-    resave: false,
+    resave: true,
     saveUninitialized: true,
     cookie: { secure: true },
     store: MongoStore.create({
@@ -150,7 +150,6 @@ app.use(passport.session());
 app.get('*', function(req,res,next) {
   res.locals.cart = req.session.cart;
   res.locals.user = req.user || null;
-  console.log(res.locals.user)
   next();
 });
 
