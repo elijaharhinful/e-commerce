@@ -125,17 +125,8 @@
         $(function() {
            
             $('a.clearcart').on('click', function () {
-                if (!confirm('Confirm clear cart'))
+                if (!confirm('Are you sure you want to clear cart?'))
                     return false;
-            });
-            
-            $('a.buynow').on('click', function (e) {
-                e.preventDefault();
-                
-                $.get('/cart/buynow', function() {
-                    $('form.pp input[type=image]').click();
-                    $('.ajaxbg').show();
-                });
             });
                 
         });

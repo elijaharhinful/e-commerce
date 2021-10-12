@@ -6,12 +6,19 @@ const bcrypt = require('bcryptjs');
 const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
+const OAuth2 = google.auth.OAuth2
 
 // Get Users model
 let User = require('../models/user');
 
 // Get Tokens model
 let Token = require('../models/token');
+
+
+const OAuth2_client = new OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+OAuth2_client.setCredentials( { refresh_token : process.env.REFRESH_TOKEN } )
+const accessToken = OAuth2_client.getAccessToken()
 
 /*
  * GET register
@@ -97,10 +104,6 @@ router.post('/register', function (req, res) {
 
                                                 // create reusable transporter object using the default SMTP transport
                                                 let transporter = nodemailer.createTransport({
-                                                    host: 'smtp.gmail.com',
-                                                    port: 465,
-                                                    secure: true,
-                                                    SMTPSecure: 'tls',
                                                     service: 'gmail',
                                                     auth: {
                                                         type: 'OAuth2',
@@ -108,12 +111,13 @@ router.post('/register', function (req, res) {
                                                         pass: process.env.MAIL_PASSWORD,
                                                         clientId: process.env.CLIENT_ID,
                                                         clientSecret: process.env.CLIENT_SECRET,
-                                                        refreshToken: process.env.REFRESH_TOKEN
+                                                        refreshToken: process.env.REFRESH_TOKEN,
+                                                        accessToken: accessToken
                                                     },
                                                 });
 
                                                 // send mail with defined transport object
-                                                let info = await transporter.sendMail({
+                                                await transporter.sendMail({
                                                     from: '"My Website 👻"elijaharhinful8@gmail.com', // sender address
                                                     to: user.email, // list of receiver (s)
                                                     subject: "Verify your My Website email", // Subject line
@@ -126,14 +130,6 @@ router.post('/register', function (req, res) {
 
                                                         'If you did not request this, please ignore this email.\n' // html body
                                                 });
-
-                                                // console.log("Message sent: %s", info.messageId);
-                                                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-                                                // Preview only available when sending through an Ethereal account
-                                                // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-                                                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
 
                                                 req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
                                                 res.redirect('/users/register-token')
