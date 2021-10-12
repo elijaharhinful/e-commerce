@@ -181,11 +181,17 @@ router.get('/clear', function (req, res) {
  */
 router.get('/payment-complete', function (req, res) {
 
-    res.render('payment_complete',{
-        user : null,
-        title : "Payment Complete"
-    });
-
+    if (res.locals.user){
+        res.render('payment_complete',{
+            user : user,
+            title : "Payment Complete"
+        });
+    }else{
+        res.render('payment_complete',{
+            user : null,
+            title : "Payment Complete"
+        });
+    }
 });
 
 // Exports
