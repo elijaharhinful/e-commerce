@@ -188,7 +188,7 @@ router.get('/payment-complete', function (req, res) {
         });
     }else{
         res.render('payment_complete',{
-            user : null,
+            user : req.user,
             title : "Payment Complete"
         });
     }
