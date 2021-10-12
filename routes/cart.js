@@ -183,12 +183,11 @@ router.get('/payment-complete', function (req, res) {
 
     if (res.locals.user){
         res.render('payment_complete',{
-            user : user,
+            user : req.user,
             title : "Payment Complete"
         });
     }else{
         res.render('payment_complete',{
-            user : req.user,
             title : "Payment Complete"
         });
     }
