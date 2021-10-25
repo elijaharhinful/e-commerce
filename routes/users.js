@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2
 
@@ -16,9 +17,9 @@ let User = require('../models/user');
 let Token = require('../models/token');
 
 
-const OAuth2_client = new OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
-OAuth2_client.setCredentials( { refresh_token : process.env.REFRESH_TOKEN } )
-const accessToken = OAuth2_client.getAccessToken()
+// const OAuth2_client = new OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+// OAuth2_client.setCredentials( { refresh_token : process.env.REFRESH_TOKEN } )
+// const accessToken = OAuth2_client.getAccessToken()
 
 /*
  * GET register
@@ -98,44 +99,51 @@ router.post('/register', function (req, res) {
                                     token.save(function (err) {
                                         if (err) {
                                             console.log(err);
-                                        } else {
-                                            async function main() {
-                                                //let testAccount = await nodemailer.createTestAccount();
-
-                                                // create reusable transporter object using the default SMTP transport
-                                                let transporter = nodemailer.createTransport({
-                                                    service: 'gmail',
-                                                    auth: {
-                                                        type: 'OAuth2',
-                                                        user: process.env.MAIL_USERNAME, // generated ethereal user
-                                                        pass: process.env.MAIL_PASSWORD,
-                                                        clientId: process.env.CLIENT_ID,
-                                                        clientSecret: process.env.CLIENT_SECRET,
-                                                        refreshToken: process.env.REFRESH_TOKEN,
-                                                        accessToken: accessToken
-                                                    },
-                                                });
-
-                                                // send mail with defined transport object
-                                                await transporter.sendMail({
-                                                    from: '"My Website 👻"elijaharhinful8@gmail.com', // sender address
-                                                    to: user.email, // list of receiver (s)
-                                                    subject: "Verify your My Website email", // Subject line
-                                                    text: 'Hello ' + user.username + ',\n\n' +
-
-                                                        'Thanks for signing up with My Website! Before you get started, we need you to confirm your email address. Please click the link below to complete your signup.\n\n' +
-                                                        'http://' + req.headers.host + '/users/confirm-email/' + token.token + '\n\n' +
-
-                                                        'If you have any trouble clicking the link, please copy and paste the URL into your prefered web browser.\n\n' +
-
-                                                        'If you did not request this, please ignore this email.\n' // html body
-                                                });
-
-                                                req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
+                                        } 
+                                        else {
+                                            
+                                            let href = {
+                                                href : "https://" +req.headers.host+ "/users/confirm-email/"+token.token
+                                            };
+                                            let htmlTemplate = `
+                                            <!DOCTYPE html>
+                                            <html>
+                                            <body>
+                                            <h1>Hello ${user.username},</h1>
+                                            <p>Thanks for signing up with My Website! Before you get started, we need you to confirm your email address. Please click the link below to complete your signup.</p>
+                                            
+                                            <button>
+                                            <a href="${href.href}">Confirm email</a>
+                                            </button>
+                                            <p>If you have any trouble clicking the link, please copy and paste the URL into your prefered web browser.</p>
+                                            <p>If you did not request this, please ignore this email.</p>
+                                            </body>
+                                            </html>
+                                    `;
+                                            async function sender(){
+                                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                            const msg = {
+                                                to: user.email,
+                                                from: process.env.MAIL_USERNAME, 
+                                                subject: 'Verify your My Website email',
+                                                html: htmlTemplate
+                                            };
+                                            (async () => {
+                                                try {
+                                                    await sgMail.send(msg);
+                                                    
+                                                    req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
                                                 res.redirect('/users/register-token')
-                                            }
-                                            main().catch(console.error);
+                                                } catch (error) {
+                                                    console.error(error);
 
+                                                    if (error.response) {
+                                                        console.error(error.response.body)
+                                                    }
+                                                }
+                                            })()
+                                            }
+                                            sender().catch(console.error);
                                         }
                                     });
 
@@ -260,56 +268,52 @@ router.post('/token-resend', function (req, res) {
                     token.save(function (err) {
                         if (err) {
                             console.log(err);
-                        } else {
-                            async function main() {
-                                //let testAccount = await nodemailer.createTestAccount();
-
-                                // create reusable transporter object using the default SMTP transport
-                                let transporter = nodemailer.createTransport({
-                                    host: 'smtp.gmail.com',
-                                    port: 465,
-                                    secure: true,
-                                    SMTPSecure: 'tls',
-                                    service: 'gmail',
-                                    auth: {
-                                        type: 'OAuth2',
-                                        user: process.env.MAIL_USERNAME, // generated ethereal user
-                                        pass: process.env.MAIL_PASSWORD,
-                                        clientId: process.env.CLIENT_ID,
-                                        clientSecret: process.env.CLIENT_SECRET,
-                                        refreshToken: process.env.REFRESH_TOKEN
-                                    },
-                                });
-
-                                // send mail with defined transport object
-                                let info = await transporter.sendMail({
-                                    from: '"My Website 👻" elijaharhinful8@gmail.com', // sender address
-                                    to: user.email, // list of receiver (s)
-                                    subject: "Verify your My Website email", // Subject line
-                                    text: 'Hello ' + user.username + ',\n\n' +
-
-                                        'Thanks for signing up with My Website! Before you get started, we need you to confirm your email address. Please click the link below to complete your signup.\n\n' +
-                                        'http://' + req.headers.host + '/users/confirm-email/' + token.token + '\n\n' +
-
-                                        'If you have any trouble clicking the link, please copy and paste the URL into your prefered web browser.\n\n' +
-
-                                        'If you did not request this, please ignore this email.\n' // html body
-                                });
-
-                                // console.log("Message sent: %s", info.messageId);
-                                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-                                // Preview only available when sending through an Ethereal account
-                                // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-                                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-
-                                req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
+                        } 
+                        else {
+                            let href = {
+                                href : "https://" +req.headers.host+ "/users/confirm-email/"+token.token
+                            };
+                            let htmlTemplate = `
+                            <!DOCTYPE html>
+                            <html>
+                            <body>
+                            <h1>Hello ${user.username},</h1>
+                            <p>Thanks for signing up with My Website! Before you get started, we need you to confirm your email address. Please click the link below to complete your signup.</p>
+                            
+                            <button>
+                            <a href="${href.href}">Confirm email</a>
+                            </button>
+                            <p>If you have any trouble clicking the link, please copy and paste the URL into your prefered web browser.</p>
+                            <p>If you did not request this, please ignore this email.</p>
+                            </body>
+                            </html>
+                    `;
+                            async function sender(){
+                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                            const msg = {
+                                to: user.email,
+                                from: process.env.MAIL_USERNAME, 
+                                subject: 'Verify your My Website email',
+                                html: htmlTemplate
+                            };
+                            (async () => {
+                                try {
+                                    await sgMail.send(msg);
+                                    
+                                    req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
                                 res.redirect('/users/register-token')
-                            }
-                            main().catch(console.error);
+                                } catch (error) {
+                                    console.error(error);
 
+                                    if (error.response) {
+                                        console.error(error.response.body)
+                                    }
+                                }
+                            })()
+                            }
+                            sender().catch(console.error);
                         }
+                            
                     });
 
                 });
@@ -405,58 +409,57 @@ router.post('/forgot', function (req, res) {
                     user.save(function (err) {
                         if (err) {
                             console.log(err);
-                        } else {
-                            async function main() {
-                                //let testAccount = await nodemailer.createTestAccount();
+                        }
+                        else {
+                            let send_token = {
+                                token : token
+                            };
+                            let htmlTemplate = `
+                            <!DOCTYPE html>
+                            <html>
+                            <body>
+                            <h1>Hello ${user.username},</h1>
+                            <p>Please use the code below to reset your password. </p>
+                            
+                            <h3>${send_token.token}</h3>
 
-                                // create reusable transporter object using the default SMTP transport
-                                let transporter = nodemailer.createTransport({
-                                    host: 'smtp.gmail.com',
-                                    port: 465,
-                                    secure: true,
-                                    SMTPSecure: 'tls',
-                                    service: 'gmail',
-                                    auth: {
-                                        type: 'OAuth2',
-                                        user: process.env.MAIL_USERNAME, // generated ethereal user
-                                        pass: process.env.MAIL_PASSWORD,
-                                        clientId: process.env.CLIENT_ID,
-                                        clientSecret: process.env.CLIENT_SECRET,
-                                        refreshToken: process.env.REFRESH_TOKEN
-                                    },
-                                });
-
-                                // send mail with defined transport object
-                                let info = await transporter.sendMail({
-                                    from: '"My Website 👻"elijaharhinful8@gmail.com', // sender address
-                                    to: user.email, // list of receiver (s)
-                                    subject: "Verify your My Website email", // Subject line
-                                    text: 'Hello ' + user.username + ',\n\n' +
-
-                                        'Please use the code below to reset your password.\n\n' +
-                                        token + '\n\n' +
-                                        'The code expirese in an hour. \n\n' +
-                                        'If you did not request a password reset, please ignore this email and your password will be intact.\n'
-                                });
-
-                                //console.log("Message sent: %s", info.messageId);
-                                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-                                // Preview only available when sending through an Ethereal account
-                               // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-                                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-
-                                req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                            <p><i>The code expirese in an hour.</i></p>
+                            <p>If you did not request a password reset, please ignore this email and your password will be intact.</p>
+                            </body>
+                            </html>
+                    `;
+                            async function sender(){
+                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                            const msg = {
+                                to: user.email,
+                                from: process.env.MAIL_USERNAME, 
+                                subject: 'Verify your My Website email',
+                                html: htmlTemplate
+                            };
+                            (async () => {
+                                try {
+                                    await sgMail.send(msg);
+                                    
+                                    req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
                                 res.render('token', {
                                     title: "Token",
                                     user: null,
                                     user_id: user.id,
                                     token: token
                                 });
+                                } catch (error) {
+                                    console.error(error);
+
+                                    if (error.response) {
+                                        console.error(error.response.body)
+                                    }
+                                }
+                            })()
                             }
-                            main().catch(console.error);
-                        }
+                            sender().catch(console.error);
+                            
+
+                        } 
                     });
                 });
 
@@ -514,58 +517,55 @@ router.post('/forgot-resend', function (req, res) {
                     user.save(function (err) {
                         if (err) {
                             console.log(err);
-                        } else {
-                            async function main() {
-                                //let testAccount = await nodemailer.createTestAccount();
+                        }
+                        else {
+                            let send_token = {
+                                token : token
+                            };
+                            let htmlTemplate = `
+                            <!DOCTYPE html>
+                            <html>
+                            <body>
+                            <h1>Hello ${user.username},</h1>
+                            <p>Please use the code below to reset your password. </p>
+                            
+                            <h3>${send_token.token}</h3>
 
-                                // create reusable transporter object using the default SMTP transport
-                                let transporter = nodemailer.createTransport({
-                                    host: 'smtp.gmail.com',
-                                    port: 465,
-                                    secure: true,
-                                    SMTPSecure: 'tls',
-                                    service: 'gmail',
-                                    auth: {
-                                        type: 'OAuth2',
-                                        user: process.env.MAIL_USERNAME, // generated ethereal user
-                                        pass: process.env.MAIL_PASSWORD,
-                                        clientId: process.env.CLIENT_ID,
-                                        clientSecret: process.env.CLIENT_SECRET,
-                                        refreshToken: process.env.REFRESH_TOKEN
-                                    },
-                                });
-
-                                // send mail with defined transport object
-                                let info = await transporter.sendMail({
-                                    from: '"My Website 👻"elijaharhinful8@gmail.com', // sender address
-                                    to: user.email, // list of receiver (s)
-                                    subject: "Verify your My Website email", // Subject line
-                                    text: 'Hello ' + user.username + ',\n\n' +
-
-                                        'Please use the code below to reset your password.\n\n' +
-                                        token + '\n\n' +
-                                        'The code expirese in an hour. \n\n' +
-                                        'If you did not request a password reset, please ignore this email and your password will be intact.\n'
-                                });
-
-                                // console.log("Message sent: %s", info.messageId);
-                                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-                                // Preview only available when sending through an Ethereal account
-                                // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-                                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-
-                                req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                            <p><i>The code expirese in an hour.</i></p>
+                            <p>If you did not request a password reset, please ignore this email and your password will be intact.</p>
+                            </body>
+                            </html>
+                    `;
+                            async function sender(){
+                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                            const msg = {
+                                to: user.email,
+                                from: process.env.MAIL_USERNAME, 
+                                subject: 'Verify your My Website email',
+                                html: htmlTemplate
+                            };
+                            (async () => {
+                                try {
+                                    await sgMail.send(msg);
+                                    
+                                    req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
                                 res.render('token', {
                                     title: "Token",
                                     user: null,
                                     user_id: user.id,
                                     token: token
                                 });
+                                } catch (error) {
+                                    console.error(error);
+
+                                    if (error.response) {
+                                        console.error(error.response.body)
+                                    }
+                                }
+                            })()
                             }
-                            main().catch(console.error);
-                        }
+                            sender().catch(console.error);
+                        } 
                     });
                 });
 
