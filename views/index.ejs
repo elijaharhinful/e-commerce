@@ -81,7 +81,7 @@
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
-                                    <h6><%= p.title %></h6>
+                                    <h6><%= p.title.toUpperCase() %></h6>
                                     <a href="/cart/add/<%= p.slug %>" class="add-cart">+ Add To Cart</a>
                                     <h5>₵<%= parseFloat(p.price).toFixed(2) %></h5>
                                 </div>
@@ -93,8 +93,40 @@
                     <% } %>
                     
                 <% }); %>
-                
+            
             </div>
+            <div class="row">
+                        <div class="col-lg-12">
+                            <div class="product__pagination">
+                                <% if (pagesNeeded > 0){ %>
+                                    <% if(pageNumber == 1){ %> 
+                                        <a class="disabled first" href="?page=<%= pageNumber; %>"> First </a>
+                                    <%}else{ %> 
+                                        <a class="last" href="?page=<%= pageNumber; %>"> First </a>
+                                    <%} %>
+                                    <% let i = (Number(pageNumber) > 5 ? Number(pageNumber) - 4 : 1) %>
+                                    <% if (i !==1){ %>
+                                        <a href="#">...</a>
+                                    <%}%>
+                                    <% for (; i <= (Number(pageNumber) + 4) && i <= pagesNeeded; i++){ %> 
+                                        <% if (i == pageNumber){ %> 
+                                            <a class="active" href="?page=<%= i; %>"> <%= i %></a>
+                                        <%}else {%> 
+                                            <a href="?page=<%= i; %>"> <%= i %></a>
+                                        <%}%>
+                                        <% if( i == Number(pageNumber) + 4 & i < pages){ %> 
+                                            <a class="disabled" href="#">...</a>   
+                                        <%} %>
+                                    <%}%>
+                                    <% if (pageNumber == pagesNeeded){ %> 
+                                        <a class="disabled last" href="?page=<%= pagesNeeded; %>"> Last</a>
+                                        <%} else{ %>
+                                            <a class="last" href="?page=<%= pagesNeeded; %>"> Last</a>
+                                            <% }%>
+                                <%} %>
+                            </div>
+                        </div>
+                    </div>
             <div class="all_products">
                 <a class="site-btn" href="/products">All Products</a>
             </div>

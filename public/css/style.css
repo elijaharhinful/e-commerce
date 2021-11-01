@@ -1460,6 +1460,11 @@ ol {
 	border-radius: 0;
 }
 
+.all_products{
+	padding-top: 25px;
+	text-align: center;
+}
+
 .product__pagination {
 	padding-top: 25px;
 	text-align: center;
@@ -1493,6 +1498,13 @@ ol {
 	color: #111111;
 	padding-left: 10px;
 	padding-right: 15px;
+}
+.product__pagination .first{
+	padding-right: 39px !important;	
+}
+.product__pagination .first:hover,.product__pagination .last:hover {
+	border-color: white !important;
+	color: lightsalmon !important;
 }
 
 /*---------------------

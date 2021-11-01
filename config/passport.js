@@ -21,7 +21,7 @@ module.exports = function (passport) {
             // Make sure the user has been verified
             if (!user.isVerified) {
                 return done(null, false, {
-                    message: 'Your account has not been verified!'
+                    message: 'Your account has not been verified. Verify account!'
                 });
             }
 

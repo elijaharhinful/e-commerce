@@ -65,8 +65,18 @@ router.post('/register', function (req, res) {
                 console.log(err);
 
             if (user) {
-                req.flash('danger', 'Username exists, choose another!');
-                res.redirect('/users/register');
+                if (user.email === email) {
+                    if (user.isVerified === false) {
+                        req.flash('danger', 'There is an account with this email address but it is not verified. Verify account to continue!');
+                        res.redirect('/users/token-resend');
+                    } else {
+                        req.flash('danger', 'There is an account with this email address, choose another one or login to continue!');
+                        res.redirect('/users/register');
+                    }
+                } else {
+                    req.flash('danger', 'Username exists, choose another!');
+                    res.redirect('/users/register');
+                }
             } else {
                 let user = new User({
                     name: name,
@@ -112,7 +122,7 @@ router.post('/register', function (req, res) {
                                             <h1>Hello ${user.username},</h1>
                                             <p>Thanks for signing up with My Website! Before you get started, we need you to confirm your email address. Please click the link below to complete your signup.</p>
                                             
-                                            <button>
+                                            <button style="padding:15px; background-color:yellow;color:black">
                                             <a href="${href.href}">Confirm email</a>
                                             </button>
                                             <p>If you have any trouble clicking the link, please copy and paste the URL into your prefered web browser.</p>
@@ -187,7 +197,7 @@ router.get('/confirm-email/:token', function (req, res) {
 
         if (!token) {
             req.flash('danger', 'Token is invalid or may have expired!');
-            res.redirect('/users/login');
+            res.redirect('/users/token-resend');
         } else {
             if (token) {
                 User.findById(token._userId, function (err, user) {
@@ -237,7 +247,7 @@ router.post('/token-resend', function (req, res) {
     let errors = req.validationErrors();
 
     if (errors) {
-        res.render('register', {
+        res.render('token-resend', {
             errors: errors,
             user: null,
             title: 'token-resend'
@@ -280,7 +290,7 @@ router.post('/token-resend', function (req, res) {
                             <h1>Hello ${user.username},</h1>
                             <p>Thanks for signing up with My Website! Before you get started, we need you to confirm your email address. Please click the link below to complete your signup.</p>
                             
-                            <button>
+                            <button style="padding:15px; background-color:yellow;color:black">
                             <a href="${href.href}">Confirm email</a>
                             </button>
                             <p>If you have any trouble clicking the link, please copy and paste the URL into your prefered web browser.</p>
@@ -344,7 +354,7 @@ router.post('/login', function (req, res, next) {
     passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/users/login',
-        isVerified: '/users/login',
+        isVerified: '/users/token-resend',
         failureFlash: true
     })(req, res, next);
 

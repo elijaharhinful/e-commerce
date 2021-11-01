@@ -14,15 +14,27 @@ const Category = require('../models/category');
  * GET all products
  */
 router.get('/', function (req, res) {
-    Product.find(function (err, products) {
-        if (err)
-            console.log(err);
+    let perPage = 12;
+    let pageNumber = (req.query.page == null) ? 1 : req.query.page;
+    let startFrom = (pageNumber - 1) * perPage;
 
-        res.render('all_products', {
-            title: 'All products',
-            products: products
-        });
-    });
+    Product
+        .find({})
+        .skip(startFrom)
+        .limit(perPage)
+        .exec(function (err, products) {
+            Product.count().exec(function (err, count) {
+                if (err) console.log(err);
+                let pagesNeeded = Math.ceil(count / perPage);
+                
+                res.render('all_products', {
+                    title: 'All products',
+                    products: products,
+                    pageNumber: pageNumber,
+                    pagesNeeded: pagesNeeded
+                });
+            })
+        })
 });
 
 /*
@@ -33,17 +45,28 @@ router.get('/:category', function (req, res) {
     let categorySlug = req.params.category;
 
     Category.findOne({slug: categorySlug}, function (err, c) {
-        Product.find({
-            category: categorySlug
-        }, function (err, products) {
-            if (err)
-                console.log(err);
+        let perPage = 12;
+        let pageNumber = (req.query.page == null) ? 1 : req.query.page;
+        let startFrom = (pageNumber - 1) * perPage;
 
-            res.render('cat_products', {
-                title: c.title,
-                products: products
-            });
-        });
+    Product
+        .find({category: categorySlug})
+        .skip(startFrom)
+        .limit(perPage)
+        .exec(function (err, products) {
+            Product.count().exec(function (err, count) {
+                if (err) console.log(err);
+                let pagesNeeded = Math.ceil(count / perPage);
+                
+                res.render('cat_products', {
+                    title: c.title,
+                    products: products,
+                    pageNumber: pageNumber,
+                    pagesNeeded: pagesNeeded
+                });
+            })
+        })
+        
     });
 
 });

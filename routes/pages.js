@@ -23,16 +23,39 @@ router.get('/', function (req, res) {
     }, function (err, page) {
         if (err)
             console.log(err);
-        Product.find(function (err, products) {
-            if (err)
-                console.log(err);
 
-            res.render('index', {
-                title: page.title,
-                content: page.content,
-                products: products
-            });
-        });
+            let perPage = 12;
+            let pageNumber = (req.query.page == null) ? 1 : req.query.page;
+            let startFrom = (pageNumber - 1) * perPage;
+        
+            Product
+                .find({})
+                .skip(startFrom)
+                .limit(perPage)
+                .exec(function (err, products) {
+                    Product.count().exec(function (err, count) {
+                        if (err) console.log(err);
+                        let pagesNeeded = Math.ceil(count / perPage);
+                        
+                        res.render('index', {
+                            title: page.title,
+                            content: page.content,
+                            products: products,
+                            pageNumber: pageNumber,
+                            pagesNeeded: pagesNeeded
+                        });
+                    })
+                })
+        // Product.find(function (err, products) {
+        //     if (err)
+        //         console.log(err);
+
+        //     res.render('index', {
+        //         title: page.title,
+        //         content: page.content,
+        //         products: products
+        //     });
+        // });
     });
 
 });

@@ -27,7 +27,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link active" data-toggle="tab" href="<%= tab_href %>" role="tab" aria-selected="true">
                                         <div class="product__thumb__pic set-bg"
-                                            data-setbg="/product_images/<%= p.id %>/gallery/<%= image %>">
+                                            data-setbg="/product_images/<%= p.id %>/gallery/thumbs/<%= image %>">
                                         </div>
                                     </a>
                                 </li>
@@ -35,7 +35,7 @@
                                     <li class="nav-item">
                                         <a class="nav-link" data-toggle="tab" href="<%= tab_href %>" role="tab" aria-selected="false">
                                             <div class="product__thumb__pic set-bg"
-                                                data-setbg="/product_images/<%= p.id %>/gallery/<%= image %>">
+                                                data-setbg="/product_images/<%= p.id %>/gallery/thumbs/<%= image %>">
                                             </div>
                                         </a>
                                     </li>
@@ -53,13 +53,13 @@
                                 <% if (index == 0){ %> 
                                     <div class="tab-pane active" id="<%= tab_id %>" role="tabpanel">
                                         <div class="product__details__pic__item">
-                                            <img src="/product_images/<%= p.id %>/gallery/thumbs/<%= image %>" alt="">
+                                            <img src="/product_images/<%= p.id %>/gallery/<%= image %>" alt="">
                                         </div>
                                     </div>
                                     <% } else{ %> 
                                         <div class="tab-pane" id="<%= tab_id %>" role="tabpanel">
                                             <div class="product__details__pic__item">
-                                                <img src="/product_images/<%= p.id %>/gallery/thumbs/<%= image %>" alt="">
+                                                <img src="/product_images/<%= p.id %>/gallery/<%= image %>" alt="">
                                             </div>
                                         </div>
                                         <%} %>
@@ -83,7 +83,7 @@
                                 <% if (loggedIn) { %>
                                     <p><a href="/cart/add/<%= p.slug %>" class="primary-btn">Add to cart</a></p>
                                     <% } else {%>
-                                    <a class="primary-btn" style="color: red;" href="/users/login">You must be logged in to purchase items</a>
+                                    <a class="primary-btn" style="color: red;" href="/users/login">You must login to purchase items</a>
                                     <% } %>
                             </div>
                             <div class="product__details__last__option">
