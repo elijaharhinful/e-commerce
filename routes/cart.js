@@ -116,11 +116,10 @@ router.post('/checkout', function (req, res) {
         }
     }
 
-    axios.post('https://api.paystack.co/transaction/initialize', params, options)
-        .then(function (response) {
-
 req.session.ref.push({ref:new_ref});
 
+    axios.post('https://api.paystack.co/transaction/initialize', params, options)
+        .then(function (response) {
             res.redirect(response.data.data.authorization_url)
         })
         .catch(function (error) {
