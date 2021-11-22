@@ -179,7 +179,8 @@ router.get('/clear', function (req, res) {
 /*
  * GET buy now
  */
-router.get('/payment-complete/:reference', async function (req, res) {
+router.get('/payment-complete/:trxref/:reference', async function (req, res) {
+    console.log(req.params)
     if (res.locals.user){
         await axios.get('https://api.paystack.co/transaction/verify/:reference')
         .then(function (response) {
