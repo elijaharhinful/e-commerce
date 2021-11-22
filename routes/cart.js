@@ -118,6 +118,9 @@ router.post('/checkout', function (req, res) {
 
     axios.post('https://api.paystack.co/transaction/initialize', params, options)
         .then(function (response) {
+
+req.session.ref.push({ref:new_ref});
+
             res.redirect(response.data.data.authorization_url)
         })
         .catch(function (error) {
@@ -187,7 +190,8 @@ let config = {
         port: 443,
         headers: {
             Authorization: 'Bearer sk_test_3ea89404901938dd63eab962eda8b22986d2aa48'
-        }
+        },
+        params:{reference: req.session.ref.ref}
     }
 
     if (res.locals.user){
