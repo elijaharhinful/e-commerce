@@ -150,6 +150,7 @@ app.use(passport.session());
 app.get('*', function(req,res,next) {
   res.locals.cart = req.session.cart;
   res.locals.user = req.user || null;
+red.locals.ref = req.session.ref
   next();
 });
 
