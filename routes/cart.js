@@ -179,13 +179,31 @@ router.get('/clear', function (req, res) {
 /*
  * GET payment complete page
  */
-router.get('/payment-complete', function (req, res) {
-    
+
+router.get('/payment-complete', async function (req, res) {
+    console.log(req.params)
+
+let config = {
+        port: 443,
+        headers: {
+            Authorization: 'Bearer sk_test_3ea89404901938dd63eab962eda8b22986d2aa48'
+        }
+    }
+
     if (res.locals.user){
-        res.render('payment_complete',{
-            user : req.user,
-            title : "Payment Complete"
+        await axios.get('https://api.paystack.co/transaction/verify/:reference',config)
+        .then(function (response) {
+            console.log(response.data)
+            res.render('payment_complete',{
+                user : req.user,
+                title : "Payment Complete"
+            });
+            // res.redirect(response.data.data.authorization_url)
+        })
+        .catch(function (error) {
+            console.log(error);
         });
+        
     }else{
         res.render('payment_complete',{
             title : "Payment Complete"
