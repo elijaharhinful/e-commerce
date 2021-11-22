@@ -116,7 +116,14 @@ router.post('/checkout', function (req, res) {
         }
     }
 
-req.session.ref.push({ref:new_ref});
+
+ if (typeof req.session.ref == "undefined") {
+            req.session.ref = [];
+           req.session.ref.push({ref:new_ref});
+        } else {
+           req.session.ref.push({ref:new_ref});
+            }
+
 
     axios.post('https://api.paystack.co/transaction/initialize', params, options)
         .then(function (response) {
