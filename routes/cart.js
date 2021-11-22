@@ -177,24 +177,15 @@ router.get('/clear', function (req, res) {
 });
 
 /*
- * GET buy now
+ * GET payment complete page
  */
-router.get('/payment-complete', async function (req, res) {
-    console.log(req.params)
+router.get('/payment-complete', function (req, res) {
+    
     if (res.locals.user){
-        await axios.get('https://api.paystack.co/transaction/verify/:reference')
-        .then(function (response) {
-            console.log(response.data)
-            res.render('payment_complete',{
-                user : req.user,
-                title : "Payment Complete"
-            });
-            // res.redirect(response.data.data.authorization_url)
-        })
-        .catch(function (error) {
-            console.log(error);
+        res.render('payment_complete',{
+            user : req.user,
+            title : "Payment Complete"
         });
-        
     }else{
         res.render('payment_complete',{
             title : "Payment Complete"
