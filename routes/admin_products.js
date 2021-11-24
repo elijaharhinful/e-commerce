@@ -16,19 +16,28 @@ const Category = require('../models/category');
  * GET products index
  */
 router.get('/',isAdmin,  async function (req, res) {
+    res.render('admin/dashboard')
+});
+
+/*
+ * GET products page
+ */
+router.get('/products',isAdmin,  async function (req, res) {
     let count;
 
-    Product.count(function (err, c) {
+    Product.count(async function (err, c) {
         count = c;
+        await Product.find(function (err, products) {
+            res.render('admin/products', {
+                products: products,
+                count: count
+            });
+        }).clone().catch(function(err){ console.log(err)});
     });
 
-    await Product.find(function (err, products) {
-        res.render('admin/products', {
-            products: products,
-            count: count
-        });
-    }).clone().catch(function(err){ console.log(err)});
+    
 });
+
 
 /*
  * GET add product
@@ -38,13 +47,15 @@ router.get('/add-product', isAdmin, function (req, res) {
     let title = "";
     let desc = "";
     let price = "";
+    let quantity = "";
 
     Category.find(function (err, categories) {
         res.render('admin/add_product', {
             title: title,
             desc: desc,
             categories: categories,
-            price: price
+            price: price,
+            quantity: quantity
         });
     });
 
@@ -73,6 +84,7 @@ router.post('/add-product',  function (req, res) {
     let slug = title.replace(/\s+/g, '-').toLowerCase();
     let desc = req.body.desc;
     let price = req.body.price;
+    let quantity = req.body.quantity;
     let category = req.body.category;
 
     let errors = req.validationErrors();
@@ -84,7 +96,8 @@ router.post('/add-product',  function (req, res) {
                 title: title,
                 desc: desc,
                 categories: categories,
-                price: price
+                price: price,
+                quantity: quantity
             });
         });
     } else {
@@ -96,7 +109,8 @@ router.post('/add-product',  function (req, res) {
                         title: title,
                         desc: desc,
                         categories: categories,
-                        price: price
+                        price: price,
+                        quantity: quantity
                     });
                 });
             } else {
@@ -109,6 +123,7 @@ router.post('/add-product',  function (req, res) {
                     desc: desc,
                     price: price2,
                     category: category,
+                    quantity: quantity,
                     image: imageFile
                 });
 
@@ -138,7 +153,7 @@ router.post('/add-product',  function (req, res) {
                     }
 
                     req.flash('success', 'Product added!');
-                    res.redirect('/admin/products');
+                    res.redirect('/admin/Dashboard');
                 });
             }
         });
@@ -180,6 +195,7 @@ router.get('/edit-product/:id', isAdmin, function (req, res) {
                             categories: categories,
                             category: p.category.replace(/\s+/g, '-').toLowerCase(),
                             price: parseFloat(p.price).toFixed(2),
+                            quantity: p.quantity,
                             image: p.image,
                             galleryImages: galleryImages,
                             id: p._id
@@ -215,6 +231,7 @@ router.post('/edit-product/:id', function (req, res) {
     let slug = title.replace(/\s+/g, '-').toLowerCase();
     let desc = req.body.desc;
     let price = req.body.price;
+    let quantity = req.body.quantity;
     let category = req.body.category;
     let pimage = req.body.pimage;
     let id = req.params.id;
@@ -241,6 +258,7 @@ router.post('/edit-product/:id', function (req, res) {
                     p.slug = slug;
                     p.desc = desc;
                     p.price = parseFloat(price).toFixed(2);
+                    p.quantity = quantity;
                     p.category = category;
                     if (imageFile != "") {
                         p.image = imageFile;
@@ -268,7 +286,7 @@ router.post('/edit-product/:id', function (req, res) {
                         }
 
                         req.flash('success', 'Product edited!');
-                        res.redirect('/admin/products/edit-product/' + id);
+                        res.redirect('/admin/dashboard/edit-product/' + id);
                     });
 
                 });
@@ -318,7 +336,7 @@ router.get('/delete-image/:image',  function (req, res) {
                     console.log(err);
                 } else {
                     req.flash('success', 'Image deleted!');
-                    res.redirect('/admin/products/edit-product/' + req.query.id);
+                    res.redirect('/admin/dashboard/edit-product/' + req.query.id);
                 }
             });
         }
@@ -342,7 +360,7 @@ router.get('/delete-product/:id',isAdmin,  function (req, res) {
             });
             
             req.flash('success', 'Product deleted!');
-            res.redirect('/admin/products');
+            res.redirect('/admin/dashboard');
         }
     });
 

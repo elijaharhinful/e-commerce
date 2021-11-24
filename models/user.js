@@ -10,6 +10,7 @@ let UserSchema = mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true
     },
     username: {
         type: String,
@@ -26,7 +27,9 @@ let UserSchema = mongoose.Schema({
         type: String
     },
     admin: {
-        type: Number
+        type: Boolean,
+        required:true,
+        default: false
     },
     date :{
         type : Date,

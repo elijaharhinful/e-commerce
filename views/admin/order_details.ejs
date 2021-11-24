@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<%- include('../partials/adminhead'); %>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <%- include('../layouts/adminheader') %>
+
+
+    <%- include('../layouts/adminSidenav') %>
+   <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Order Details</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+              <li class="breadcrumb-item active">Order Details</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="callout callout-info">
+              <h5><i class="fas fa-info"></i> Note:</h5>
+              This page has been enhanced for printing. Click the print button at the bottom of the page to print.
+            </div>
+
+
+            <!-- Main content -->
+            <div class="invoice p-3 mb-3">
+              <!-- title row -->
+              <div class="row">
+                <div class="col-12">
+                  <h4>
+                    <i class="fas fa-globe"></i> My Website
+                    <small class="float-right">Date: 2/10/2014 (to be made dynamic)</small>
+                  </h4>
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- info row -->
+              <div class="row invoice-info">
+                <div class="col-sm-6 invoice-col">
+                  <address>
+                    <strong><%= order.name %></strong><br>
+                    <%= order.shipping.country %>, <%= order.shipping.city %><br>
+                    <%= order.shipping.address %><br>
+                    <%= order.shipping.number %><br>
+                    <%= order.shipping.email %>
+                  </address>
+                </div>
+                <!-- /.col -->
+                <div class="col-sm-6 invoice-col">
+                  <b>Order ID:</b> <%= order.id %><br>
+                  <b>Payment Method:</b> <%= order.payment.paymentMethod %><br>
+                  <b>PayerId:</b> <%= order.payment.payerId %>
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+
+              <!-- Table row -->
+              <div class="row">
+                <div class="col-12 table-responsive">
+                  <%if (order.cart.length <= 1){ %>
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Reference</th>
+                        <th>Image</th>
+                        <th>Subtotal</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <% cartOrder.forEach(function(cartOrder){ %>
+                      <tr>
+                        <td><%= cartOrder.title %></td>
+                        <td><%= cartOrder.qty %></td>
+                        <td><%= order.payment.reference %></td>
+                        <td>
+                          <% if (cartOrder.image == "") { %>
+                          <img id="noimage" src="/img/noimage.png">
+                          <% } else {%>
+                          <img id="noimage"
+                              src="<%= cartOrder.image %>"
+                              style="width: 100px;height: 100px;">
+                          <% }%>
+                      </td>
+                        <td><%= parseFloat(cartOrder.qty * cartOrder.price).toFixed(2) %></td>
+                      </tr>
+                      <% }); %>
+                      </tbody>
+                    </table>
+                  <% } else{%>
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Reference</th>
+                        <th>Image</th>
+                        <th>Subtotal</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        <% cartOrder.forEach(function(cartOrder){ %>
+                      <tr>
+                        <td><%= cartOrder.title %></td>
+                        <td><%= cartOrder.qty %></td>
+                        <td><%= order.payment.reference %></td>
+                        <td>
+                          <% if (cartOrder.image == "") { %>
+                          <img id="noimage" src="/img/noimage.png">
+                          <% } else {%>
+                          <img id="noimage"
+                              src="<%= cartOrder.image %>"
+                              style="width: 100px;height: 100px;">
+                          <% }%>
+                      </td>
+                        <td><%= parseFloat(cartOrder.qty * cartOrder.price).toFixed(2) %> </td>
+                      </tr>
+                      <% }); %>
+                      </tbody>
+                    </table>
+                    <% } %>
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+
+              <div class="row">
+                <!-- /.col -->
+                <div class="col-6">
+                  <p class="lead">Amount Due</p>
+                  <% let delivery = 5; %>
+
+                  <div class="table-responsive">
+                    <table class="table">
+                      <tr>
+                        <th>Delivery charged:</th>
+                        <td>₵5.00</td>
+                      </tr>
+                      <tr>
+                        <th>Discount applied:</th>
+                        <td><%= order.payment.discount %>%</td>
+                      </tr>
+                      <tr>
+                        <th>Total:</th>
+                        <td>₵<%= order.total %></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+
+              <!-- this row will not appear when printing -->
+              <div class="row no-print">
+                <div class="col-12">
+                  <a href="invoice-print.html" rel="noopener" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                  <button type="button" class="btn btn-success float-right"><i class="far fa-credit-card"></i> Submit
+                    Payment
+                  </button>
+                  <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
+                    <i class="fas fa-download"></i> Generate PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- /.invoice -->
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+    <%- include('../layouts/adminfooter') %>
+</body>
+<script>
+    $(function () {
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+
+    $('a.confirmDeletion').on('click', function () {
+        if (!confirm('Are you sure you want to delete product?'))
+            return false;
+    });
+</script>
+
+</html>

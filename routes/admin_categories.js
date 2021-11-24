@@ -10,6 +10,13 @@ let Category = require('../models/category');
  * GET category index
  */
 router.get('/', isAdmin,  function (req, res) {
+        res.render('admin/dashboard');
+});
+
+/*
+ * GET category page
+ */
+router.get('/categories', isAdmin,  function (req, res) {
     Category.find(function (err, categories) {
         if (err)
             return console.log(err);
@@ -75,7 +82,7 @@ router.post('/add-category', function (req, res) {
                     });
 
                     req.flash('success', 'Category added!');
-                    res.redirect('/admin/categories');
+                    res.redirect('/admin/dashboard');
                 });
             }
         });
@@ -148,7 +155,7 @@ router.post('/edit-category/:id', function (req, res) {
                         });
 
                         req.flash('success', 'Category edited!');
-                        res.redirect('/admin/categories/edit-category/' + id);
+                        res.redirect('/admin/dashboard/edit-category/' + id);
                     });
 
                 });
@@ -177,7 +184,7 @@ router.get('/delete-category/:id', isAdmin, function (req, res) {
         });
 
         req.flash('success', 'Category deleted!');
-        res.redirect('/admin/categories/');
+        res.redirect('/admin/dashboard/');
     });
 });
 

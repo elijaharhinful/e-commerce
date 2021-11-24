@@ -2,149 +2,181 @@
 <html>
 <%- include('../partials/adminhead'); %>
 
-<body class="main-layout">
+<body class="hold-transition sidebar-mini layout-fixed">
     <%- include('../layouts/adminheader') %>
-    <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Edit a product</h4>
-                        <div class="breadcrumb__links">
-                            <a href="/admin/products">Products</a>
-                            <span>Edit product</span>
+
+
+    <%- include('../layouts/adminSidenav') %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Edit product</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/admin/dashboard/products">Products</a></li>
+                            <li class="breadcrumb-item active">Edit product</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <div class="btn btn-primary btn-lg btn-sm float-sm-right">
+                            <a href="/admin/dashboard/products" style="color: white;">
+                                <i class="fas fa-angle-left fa-lg mr-2"></i>Back to all products
+                            </a>
                         </div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Fill form details to edit product</h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="/admin/dashboard/edit-product/<%= id %>"
+                                enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="">Title</label>
+                                    <input type="text" class="form-control" name="title" value="<%= title %>"
+                                        placeholder="Title">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Description</label>
+                                    <textarea name="desc" class="form-control" cols="30" rows="10"
+                                        placeholder="Description"><%= desc %></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Category</label>
+                                    <br>
+                                    <select name="category" class="form-control">
+                                        <% categories.forEach(function(cat){ %>
+                                        <option value="<%= cat.slug %>" <% if (cat.slug == category) { %>
+                                            selected="selected" <% } %>><%= cat.title %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Price</label>
+                                    <input type="text" class="form-control" name="price" value="<%= price %>"
+                                        placeholder="Price">
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Quantity</label>
+                                    <input type="number" class="form-control" name="quantity" value="<%= quantity %>" placeholder="Quantity" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Current Image</label>
+                                    <p>
+                                        <% if (image == "") { %>
+                                        <img id="noimage" src="/images/noimage.png" alt="">
+                                        <% } else {%>
+                                        <img id="noimage" src="/product_images/<%= id %>/<%= image %>" alt="">
+                                        <% } %>
+                                    </p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Upload Image</label>
+                                    <input type="file" class="form-control" name="image" id="img">
+                                    <img src="#" id="imgPreview" alt="">
+                                </div>
+
+                                <input type="hidden" name="pimage" value="<%= image %>">
+                                <button class="btn btn-primary">Save</button>
+                            </form>
+                        </div>
+                        <hr>
+                        <div class="card-body">
+                            <div class="contact__form">
+                                <h3 class="page-header">Gallery</h3>
+
+                                <ol class="gallery" >
+                                    <% galleryImages.forEach(function(image){ %>
+                                    <% if (image != "thumbs") { %>
+                                    <li >
+                                        <img src="/product_images/<%= id %>/gallery/thumbs/<%= image %>" alt="">&nbsp;
+                                        <a class="btn btn-danger btn-sm confirmDeletion"
+                                            href="/admin/dashboard/delete-image/<%= image %>?id=<%= id %>">
+                                            <i class="fas fa-trash">
+                                            </i>
+                                            Delete
+                                        </a>
+                                    </li>
+                                    <hr>
+                                    <% } %>
+                                    <% }); %>
+                                </ol>
+                                <br><br>
+                                <form action="/admin/products/product-gallery/<%= id %>" method="post"
+                                    enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
+                                    <div class="fallback">
+                                        <input type="file" name="file" multiple>
+                                        <input type="submit" value="Upload">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
                     </div>
+                    <!-- /.card -->
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- Breadcrumb Section End -->
-    <br>
-    <br>
-
-    <section>
-        <div class="container">
-
-            <div class="contact__form">
-                <a href="/admin/products" class="btn btn-primary">Back to all products</a>
-                <br><br>
-                <h2>Add New Product</h2>
-                <br>
-                <form method="post" action="/admin/products/edit-product/<%= id %>" enctype="multipart/form-data">
-
-                    <div class="form-group">
-                        <label for="">Title</label>
-                        <input type="text" class="form-control" name="title" value="<%= title %>" placeholder="Title">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="">Description</label>
-                        <textarea name="desc" class="form-control" cols="30" rows="10"
-                            placeholder="Description"><%= desc %></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="">Category</label>
-                        <br>
-                        <select name="category" class="form-control">
-                            <% categories.forEach(function(cat){ %>
-                            <option value="<%= cat.slug %>" <% if (cat.slug == category) { %> selected="selected"
-                                <% } %>><%= cat.title %></option>
-                            <% }); %>
-                        </select>
-                    </div>
-
-                    <br><br>
-                    <div class="form-group">
-                        <label for="">Price</label>
-                        <input type="text" class="form-control" name="price" value="<%= price %>" placeholder="Price">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="">Current Image</label>
-                        <p>
-                            <% if (image == "") { %>
-                            <img id="noimage" src="/images/noimage.png" alt="">
-                            <% } else {%>
-                            <img id="noimage" src="/product_images/<%= id %>/<%= image %>" alt="">
-                            <% } %>
-                        </p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="">Upload Image</label>
-                        <input type="file" class="form-control" name="image" id="img">
-                        <img src="#" id="imgPreview" alt="">
-                    </div>
-
-                    <input type="hidden" name="pimage" value="<%= image %>">
-                    <button class="btn btn-primary">Save</button>
-                </form>
-            </div>
-            <hr>
-            
-
-            <br><br>
-            <div class="contact__form">
-                <h3 class="page-header">Gallery</h3>
-
-            <ul class="gallery">
-                <% galleryImages.forEach(function(image){ %>
-                <% if (image != "thumbs") { %>
-                <li>
-                    <img src="/product_images/<%= id %>/gallery/thumbs/<%= image %>" alt="">&nbsp;
-                    <a class="confirmDeletion" href="/admin/products/delete-image/<%= image %>?id=<%= id %>">delete</a>
-                </li>
-                <% } %>
-                <% }); %>
-            </ul>
-            <br><br>
-                <form action="/admin/products/product-gallery/<%= id %>" method="post" enctype="multipart/form-data"
-                    class="dropzone" id="dropzoneForm">
-                    <div class="fallback">
-                        <input type="file" name="file" multiple>
-                        <input type="submit" value="Upload">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-    <br>
-    <br>
-
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
     <%- include('../layouts/adminfooter') %>
-    <script>
-        // Preview image
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $("#imgPreview").attr('src', e.target.result).width(100).height(100);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        $("#img").change(function () {
-            readURL(this);
-        });
-
-        // Dropzone
-        Dropzone.options.dropzoneForm = {
-            acceptedFiles: "image/*",
-            init: function () {
-                this.on("queuecomplete", function (file) {
-                    setTimeout(function () {
-                        location.reload()
-                    }, 1000);
-                });
-            }
-        }
-    </script>
 </body>
+<script>
+    // Preview image
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $("#imgPreview").attr('src', e.target.result).width(100).height(100);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#img").change(function () {
+        readURL(this);
+    });
+
+    // Dropzone
+    Dropzone.options.dropzoneForm = {
+        acceptedFiles: "image/*",
+        init: function () {
+            this.on("queuecomplete", function (file) {
+                setTimeout(function () {
+                    location.reload()
+                }, 1000);
+            });
+        }
+    }
+
+    $('a.confirmDeletion').on('click', function () {
+        if (!confirm('Are you sure you want to delete image?'))
+            return false;
+    });
+</script>
 
 </html>

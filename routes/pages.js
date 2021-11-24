@@ -13,50 +13,80 @@ const Category = require('../models/category');
 // Get Users model
 let User = require('../models/user');
 
+// Get Analytics model
+let Analytics = require('../models/analytics');
+
 /*
  * GET /
  */
 router.get('/', function (req, res) {
-
-    Page.findOne({
-        slug: 'home'
-    }, function (err, page) {
-        if (err)
-            console.log(err);
-
-            let perPage = 12;
-            let pageNumber = (req.query.page == null) ? 1 : req.query.page;
-            let startFrom = (pageNumber - 1) * perPage;
+    Analytics.findOneAndUpdate(
+        {title: "counter"}, { $inc: { count: 1 }}, function(err, counter) {
+        if (err) throw err;
+        if(!counter){
+            Page.findOne({
+                slug: 'home'
+            }, function (err, page) {
+                if (err)
+                    console.log(err);
         
-            Product
-                .find({})
-                .skip(startFrom)
-                .limit(perPage)
-                .exec(function (err, products) {
-                    Product.count().exec(function (err, count) {
-                        if (err) console.log(err);
-                        let pagesNeeded = Math.ceil(count / perPage);
-                        
-                        res.render('index', {
-                            title: page.title,
-                            content: page.content,
-                            products: products,
-                            pageNumber: pageNumber,
-                            pagesNeeded: pagesNeeded
-                        });
-                    })
-                })
-        // Product.find(function (err, products) {
-        //     if (err)
-        //         console.log(err);
-
-        //     res.render('index', {
-        //         title: page.title,
-        //         content: page.content,
-        //         products: products
-        //     });
-        // });
-    });
+                    let perPage = 12;
+                    let pageNumber = (req.query.page == null) ? 1 : req.query.page;
+                    let startFrom = (pageNumber - 1) * perPage;
+                
+                    Product
+                        .find({})
+                        .skip(startFrom)
+                        .limit(perPage)
+                        .exec(function (err, products) {
+                            Product.count().exec(function (err, count) {
+                                if (err) console.log(err);
+                                let pagesNeeded = Math.ceil(count / perPage);
+                                
+                                res.render('index', {
+                                    title: page.title,
+                                    content: page.content,
+                                    products: products,
+                                    pageNumber: pageNumber,
+                                    pagesNeeded: pagesNeeded
+                                });
+                            })
+                        })
+            });
+        }
+        else{
+            Page.findOne({
+                slug: 'home'
+            }, function (err, page) {
+                if (err)
+                    console.log(err);
+        
+                    let perPage = 12;
+                    let pageNumber = (req.query.page == null) ? 1 : req.query.page;
+                    let startFrom = (pageNumber - 1) * perPage;
+                
+                    Product
+                        .find({})
+                        .skip(startFrom)
+                        .limit(perPage)
+                        .exec(function (err, products) {
+                            Product.count().exec(function (err, count) {
+                                if (err) console.log(err);
+                                let pagesNeeded = Math.ceil(count / perPage);
+                                
+                                res.render('index', {
+                                    title: page.title,
+                                    content: page.content,
+                                    products: products,
+                                    pageNumber: pageNumber,
+                                    pagesNeeded: pagesNeeded
+                                });
+                            })
+                        })
+            });
+        }
+     });
+    
 
 });
 

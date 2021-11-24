@@ -2,62 +2,88 @@
 <html>
 <%- include('../partials/adminhead'); %>
 
-<body class="main-layout">
+<body class="hold-transition sidebar-mini layout-fixed">
     <%- include('../layouts/adminheader') %>
-    <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Edit a page</h4>
-                        <div class="breadcrumb__links">
-                            <a href="/admin/pages">Pages</a>
-                            <span>Edit page</span>
+
+
+    <%- include('../layouts/adminSidenav') %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Edit page</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/admin/dashboard/pages">Pages</a></li>
+                            <li class="breadcrumb-item active">Edit page</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <div class="btn btn-primary btn-lg btn-sm float-sm-right">
+                            <a href="/admin/dashboard/pages" style="color: white;">
+                                <i class="fas fa-angle-left fa-lg mr-2"></i>Back to all pages
+                            </a>
                         </div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Fill form details to edit page</h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="/admin/dashboard/edit-page/<%= id %>">
+
+                                <div class="form-group">
+                                    <label for="">Title</label>
+                                    <input type="text" class="form-control" name="title" value="<%= title %>" placeholder="Title">
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="">Slug</label>
+                                    <input type="text" class="form-control" name="slug" value="<%= slug %>" placeholder="Slug">
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="">Content</label>
+                                    <textarea name="content" class="form-control" id="editor" cols="30" rows="10"
+                                        placeholder="Content"><%= content %></textarea>
+                                </div>
+                            
+                                <button class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                        <!-- /.card-body -->
                     </div>
+                    <!-- /.card -->
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- Breadcrumb Section End -->
-    <br>
-    <br>
-    
-    <section>
-        <div class="container">
-            
-            <div class="contact__form">
-                <a href="/admin/pages" class="btn btn-primary">Back to all pages</a>
-            <br><br>
-                <h2>Edit a Page</h2>
-                <br>
-                <form method="post" action="/admin/pages/edit-page/<%= id %>">
-    
-                    <div class="form-group">
-                        <label for="">Title</label>
-                        <input type="text" class="form-control" name="title" value="<%= title %>" placeholder="Title">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="">Slug</label>
-                        <input type="text" class="form-control" name="slug" value="<%= slug %>" placeholder="Slug">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="">Content</label>
-                        <textarea name="content" class="form-control" id="editor" cols="30" rows="10" placeholder="Content"><%= content %></textarea>
-                    </div>
-                    
-                    <button class="btn btn-primary">Save</button>
-                </form>
-            </div>
-        </div>
-    </section>
-    <br>
-    <br>
-
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
     <%- include('../layouts/adminfooter') %>
 </body>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#editor'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
 
 </html>

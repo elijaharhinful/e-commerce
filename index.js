@@ -8,6 +8,10 @@ const expressValidator = require('express-validator');
 const fileUpload = require('express-fileupload');
 const passport = require('passport');
 const MongoStore = require('connect-mongo');
+const moment = require('moment');
+// Get Requests Model
+let RequestLog = require('./models/request');
+
 
 //conect to database
 main().catch(err => console.log(err));
@@ -26,6 +30,10 @@ async function main() {
 
 //init app
 let app = express();
+
+
+
+
 
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -62,6 +70,8 @@ Category.find(function (err, categories) {
         app.locals.categories = categories;
     }
 });
+
+
 
 // Express fileUpload middleware
 app.use(fileUpload());
@@ -153,6 +163,26 @@ app.get('*', function(req,res,next) {
   next();
 });
 
+//Analytics middleware
+app.use((req, res, next) => {
+  let requestTime = Date.now();
+  res.on('finish', () => {
+      if (req.path === '/analytics') {
+          return;
+      }
+
+      RequestLog.create({
+          url: req.path,
+          method: req.method,
+          responseTime: (Date.now() - requestTime) / 1000, // convert to seconds
+          day: moment(requestTime).format("dddd"),
+          hour: moment(requestTime).hour()
+      });
+  });
+  next();
+});
+
+
 // Set routes 
 const pages = require('./routes/pages.js');
 const products = require('./routes/products.js');
@@ -161,11 +191,18 @@ const users = require('./routes/users.js');
 const adminPages = require('./routes/admin_pages.js');
 const adminCategories = require('./routes/admin_categories.js');
 const adminProducts = require('./routes/admin_products.js');
-const database = require('./config/database');
+const adminCoupons = require('./routes/admin_coupons.js');
+const adminOther = require('./routes/admin_other.js');
+const adminAnalytics = require('./routes/analytics.js');
 
-app.use('/admin/pages', adminPages);
-app.use('/admin/categories', adminCategories);
-app.use('/admin/products', adminProducts);
+
+
+app.use('/admin/dashboard', adminPages);
+app.use('/admin/dashboard', adminCategories);
+app.use('/admin/dashboard', adminProducts);
+app.use('/admin/dashboard', adminCoupons);
+app.use('/admin/dashboard', adminOther);
+app.use('/admin/dashboard', adminAnalytics);
 app.use('/products', products);
 app.use('/cart', cart);
 app.use('/users', users);

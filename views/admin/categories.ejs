@@ -2,61 +2,120 @@
 <html>
 <%- include('../partials/adminhead'); %>
 
-<body class="main-layout">
+<body class="hold-transition sidebar-mini layout-fixed">
     <%- include('../layouts/adminheader') %>
-    <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Categories</h4>
-                        <div class="breadcrumb__links">
-                            <a href="/admin/categories/add-category">Add category</a>
+
+
+    <%- include('../layouts/adminSidenav') %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Categories</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Categories</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <div class="btn btn-primary btn-lg btn-sm float-sm-right">
+                            <a href="/admin/dashboard/add-category" style="color: white;">
+                                <i class="fas fa-plus fa-lg mr-2"></i>Add a new category
+                            </a>
                         </div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <% if (categories) { %>
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th>#</th>
+                                            <th>Category</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% categories.forEach(function(cat){ %>
+                                        <tr class="text-center">
+                                            <td>#</td>
+                                            <td><%= cat.title %></td>
+                                            <td class="project-actions text-center">
+                                                <a class="btn btn-info btn-sm"
+                                                    href="/admin/dashboard/edit-category/<%= cat._id %>">
+                                                    <i class="fas fa-pencil-alt">
+                                                    </i>
+                                                    Edit
+                                                </a>
+                                                <a class="btn btn-danger btn-sm confirmDeletion"
+                                                    href="/admin/dashboard/delete-category/<%= cat._id %>">
+                                                    <i class="fas fa-trash">
+                                                    </i>
+                                                    Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="text-center">
+                                            <th>#</th>
+                                            <th>Category</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <% } else {%>
+                                <h3 class="text-center">There are no categories to display.</h3>
+                                <h5 class="text-center"><i>If this an error, refresh page!</i></h5>
+                                <% }%>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <!-- Breadcrumb Section End -->
-    <br>
-    <br>
-    
-    <section>
-        <div class="container">
-            
-           
-                <a href="/admin/categories/add-category" class="btn btn-primary">Add a new category</a>
-            <br><br>
-                <h2>List of Categories</h2>
-                <br>
-                <table class="table table-striped">
-
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% categories.forEach(function(cat){ %>
-                        <tr>
-                            <td><%= cat.title %></td>
-                            <td><a href="/admin/categories/edit-category/<%= cat._id %>">Edit</a></td>
-                            <td><a class="confirmDeletion" href="/admin/categories/delete-category/<%= cat._id %>">Delete</a></td>
-                        </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-           
-        </div>
-    </section>
-    <br>
-    <br>
-
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
     <%- include('../layouts/adminfooter') %>
 </body>
+<script>
+    $(function () {
+        $("#example1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
+
+    $('a.confirmDeletion').on('click', function () {
+        if (!confirm('Are you sure you want to delete product?'))
+            return false;
+    });
+</script>
 
 </html>

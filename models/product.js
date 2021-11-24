@@ -24,6 +24,35 @@ let ProductSchema = mongoose.Schema({
     },
     image: {
         type: String
+    },
+    reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        review: String
+    }],
+    ratings: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        rating: String
+    }],
+    quantity: {
+        type: Number,
+        required: true
+    },
+    discount: {
+        type: Number
+    },createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Admin'
+    },createdAt: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        required: true,
+        default: Date.now
     }
     
 });

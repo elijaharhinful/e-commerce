@@ -82,8 +82,7 @@ router.post('/register', function (req, res) {
                     name: name,
                     email: email,
                     username: username,
-                    password: password,
-                    admin: 0
+                    password: password
                 });
 
                 bcrypt.genSalt(10, function (err, salt) {
@@ -102,7 +101,7 @@ router.post('/register', function (req, res) {
                                     if (err) console.log(err);
 
                                     let token = new Token({
-                                        _userId: user.id,
+                                        userId: user.id,
                                         token: buf.toString('hex')
                                     });
 
@@ -200,7 +199,7 @@ router.get('/confirm-email/:token', function (req, res) {
             res.redirect('/users/token-resend');
         } else {
             if (token) {
-                User.findById(token._userId, function (err, user) {
+                User.findById(token.userId, function (err, user) {
                     if (err) console.log(err);
 
                     if (!user) {
@@ -271,7 +270,7 @@ router.post('/token-resend', function (req, res) {
                     if (err) console.log(err);
 
                     let token = new Token({
-                        _userId: user.id,
+                        userId: user.id,
                         token: buf.toString('hex')
                     });
 

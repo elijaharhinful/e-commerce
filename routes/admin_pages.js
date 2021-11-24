@@ -5,22 +5,83 @@ const isAdmin = auth.isAdmin;
 
 // Get Page model
 let Page = require('../models/page');
+// Get User model
+let User = require('../models/user');
+// Get Order model
+let Order = require('../models/order');
+// Get Analytics model
+let Analytics = require('../models/analytics');
+// Get Products model
+let Product = require('../models/product');
+// Get Products model
+let Category = require('../models/category');
 
+
+
+router.get('/', isAdmin, function (req, res) {
+    Analytics.findOne({
+        title: "counter"
+    }, function (err, counter) {
+        if (err) throw err;
+        if (!counter) {
+            console.log('unable to fetch counter data');
+        } else {
+            User.count({}, function (err, users) {
+                if (err) throw err;
+                if (!users) {
+                    console.log('unable to fetch user data');
+                } else {
+                    Order.count({}, function (err, orders) {
+                        if (err) throw err;
+                        if (!orders) {
+                            console.log('unable to fetch order data');
+                        } else {
+                            Product.count({}, function (err, products) {
+                                if (err) throw err;
+                                if (!products) {
+                                    console.log('unable to fetch product data');
+                                } else {
+                                    Category.count({}, function (err, categories) {
+                                        if (err) throw err;
+                                        if (!categories) {
+                                            console.log('unable to fetch category data');
+                                        } else {
+                                            res.render('admin/dashboard', {
+                                                counter: counter.count,
+                                                users: users,
+                                                orders: orders,
+                                                products: products,
+                                                categories: categories
+                                            });
+                                        };
+                                    });
+                                };
+                            });
+                        };
+                    });
+                };
+            });
+        };
+    });
+});
 /*
- * GET pages index
+ * GET pages page
  */
-router.get('/',isAdmin,  function (req, res) {
-    Page.find({}).sort({sorting: 1}).exec(function (err, pages) {
+router.get('/pages', isAdmin, function (req, res) {
+    Page.find({}).sort({
+        sorting: 1
+    }).exec(function (err, pages) {
         res.render('admin/pages', {
             pages: pages
         });
     });
 });
 
+
 /*
  * GET add page
  */
-router.get('/add-page',isAdmin, function (req, res) {
+router.get('/add-page', isAdmin, function (req, res) {
 
     let title = "";
     let slug = "";
@@ -58,7 +119,9 @@ router.post('/add-page', function (req, res) {
             content: content
         });
     } else {
-        Page.findOne({slug: slug}, function (err, page) {
+        Page.findOne({
+            slug: slug
+        }, function (err, page) {
             if (page) {
                 req.flash('danger', 'Page slug exists, choose another.');
                 res.render('admin/add_page', {
@@ -78,7 +141,9 @@ router.post('/add-page', function (req, res) {
                     if (err)
                         return console.log(err);
 
-                    Page.find({}).sort({sorting: 1}).exec(function (err, pages) {
+                    Page.find({}).sort({
+                        sorting: 1
+                    }).exec(function (err, pages) {
                         if (err) {
                             console.log(err);
                         } else {
@@ -87,7 +152,7 @@ router.post('/add-page', function (req, res) {
                     });
 
                     req.flash('success', 'Page added!');
-                    res.redirect('/admin/pages');
+                    res.redirect('/admin/dashboard/pages');
                 });
             }
         });
@@ -127,7 +192,9 @@ router.post('/reorder-pages', function (req, res) {
     let ids = req.body['id[]'];
 
     sortPages(ids, function () {
-        Page.find({}).sort({sorting: 1}).exec(function (err, pages) {
+        Page.find({}).sort({
+            sorting: 1
+        }).exec(function (err, pages) {
             if (err) {
                 console.log(err);
             } else {
@@ -141,7 +208,7 @@ router.post('/reorder-pages', function (req, res) {
 /*
  * GET edit page
  */
-router.get('/edit-page/:id',isAdmin,  function (req, res) {
+router.get('/edit-page/:id', isAdmin, function (req, res) {
 
     Page.findById(req.params.id, function (err, page) {
         if (err)
@@ -183,7 +250,12 @@ router.post('/edit-page/:id', function (req, res) {
             id: id
         });
     } else {
-        Page.findOne({slug: slug, _id: {'$ne': id}}, function (err, page) {
+        Page.findOne({
+            slug: slug,
+            _id: {
+                '$ne': id
+            }
+        }, function (err, page) {
             if (page) {
                 req.flash('danger', 'Page slug exists, choose another.');
                 res.render('admin/edit_page', {
@@ -206,7 +278,9 @@ router.post('/edit-page/:id', function (req, res) {
                         if (err)
                             return console.log(err);
 
-                        Page.find({}).sort({sorting: 1}).exec(function (err, pages) {
+                        Page.find({}).sort({
+                            sorting: 1
+                        }).exec(function (err, pages) {
                             if (err) {
                                 console.log(err);
                             } else {
@@ -216,7 +290,7 @@ router.post('/edit-page/:id', function (req, res) {
 
 
                         req.flash('success', 'Page edited!');
-                        res.redirect('/admin/pages/edit-page/' + id);
+                        res.redirect('/admin/dashboard/edit-page/' + id);
                     });
 
                 });
@@ -231,12 +305,14 @@ router.post('/edit-page/:id', function (req, res) {
 /*
  * GET delete page
  */
-router.get('/delete-page/:id',isAdmin,  function (req, res) {
+router.get('/delete-page/:id', isAdmin, function (req, res) {
     Page.findByIdAndRemove(req.params.id, function (err) {
         if (err)
             return console.log(err);
 
-        Page.find({}).sort({sorting: 1}).exec(function (err, pages) {
+        Page.find({}).sort({
+            sorting: 1
+        }).exec(function (err, pages) {
             if (err) {
                 console.log(err);
             } else {
@@ -245,7 +321,7 @@ router.get('/delete-page/:id',isAdmin,  function (req, res) {
         });
 
         req.flash('success', 'Page deleted!');
-        res.redirect('/admin/pages/');
+        res.redirect('/admin/dashboard/pages/');
     });
 });
 

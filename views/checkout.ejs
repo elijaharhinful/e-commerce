@@ -10,12 +10,12 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb__text">
-                        <h4>Check Out</h4>
+                        <h4>Checkout</h4>
                         <div class="breadcrumb__links">
                             <a href="/">Home</a>
                             <a href="/products">Shop</a>
                             <a href="/cart/my_cart">My Cart</a>
-                            <span>Check Out</span>
+                            <span>Checkout</span>
                         </div>
                     </div>
                 </div>
@@ -28,23 +28,33 @@
     <section class="checkout spad">
         <div class="container">
             <div class="checkout__form">
+                <div class="cart__discount">
+                    <h6>Discount codes</h6>
+                    <form method="POST" action="/cart/coupon">
+                        <input name="coupon" type="text" placeholder="Coupon code" value="<%= coupon.title %>">
+                        <button type="submit">Apply</button>
+                    </form>
+                </div>
                 <form id="paymentForm" method="POST" action="/cart/checkout">
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
-                            <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
-                            here</a> to enter your code</h6>
+                            <% if (coupon.discount === null){ %> 
+                                <h6 class="coupon__code"><span class="icon_tag_alt"></span> You will receive 0% off your purchase when you place your order!</h6>
+                            <%} else{%>
+                                <h6 class="coupon__code"><span class="icon_tag_alt"></span> You will receive <%=coupon.discount %>% off your purchase when you place your order!</h6>
+                            <%}%>
                             <h6 class="checkout__title">Billing Details</h6>
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="checkout__input">
                                         <p>First Name<span>*</span></p>
-                                        <input name="first-name" type="text" required>
+                                        <input name="firstname" type="text" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="checkout__input">
                                         <p>Last Name<span>*</span></p>
-                                        <input name="last-name" type="text" required>
+                                        <input name="lastname" type="text" required>
                                     </div>
                                 </div>
                             </div>
@@ -58,7 +68,7 @@
                             </div>
                             <div class="checkout__input">
                                 <p>Town/City<span>*</span></p>
-                                <input name="town" type="text" required>
+                                <input name="city" type="text" required>
                             </div>
                             <div class="checkout__input">
                                 <p>Postcode / ZIP<span>*</span></p>
@@ -88,11 +98,12 @@
                         <% if (typeof cart !== "undefined") { %>
                         <div class="col-lg-4 col-md-6">
                             <div class="checkout__order">
-                                <h4 class="order__title">Your order</h4>
-                                <div class="checkout__order__products">Product <span>Total</span></div>
                                 <% let total = 0 %>
                                 <% let sub_total = 0 %>
                                 <% let delivery = 5.00 %>
+                                <% let discount = 0 %>
+                                <h4 class="order__title">Your order</h4>
+                                <div class="checkout__order__products">Product <span>Total</span></div>
                                 <ol class="checkout__total__products">
                                     <% cart.forEach(function(product,index){ %> 
                                         <% let ind_pdt_total = 0 %>
@@ -108,20 +119,16 @@
                                 <ul class="checkout__total__all">
                                     <li>Subtotal <span>₵<%= parseFloat(sub_total).toFixed(2) %></span></li>
                                     <li>Delivery Fee <span>₵ 5.00</span></li>
+                                    <li>Discount <span><%= coupon.discount %></span></li>
 
-                                    <% total = parseFloat(sub_total + delivery).toFixed(2) %>
+                                    <% let someTotal = parseFloat(sub_total + delivery).toFixed(2) %>
+
+                                    <% total = parseFloat(someTotal - coupon.discount).toFixed(2) %>
                                     <li id="amount" >Total <span>₵<%= parseFloat(total).toFixed(2) %></span></li>
                                 </ul>
-                                
-                                
-                                <div class="checkout__input__checkbox">
-                                    <label for="paypal">
-                                        Paypal
-                                        <input type="checkbox" id="paypal">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
+                            
                                 <div class="checkout__input">
+                                    <input name="discount" type="text" value="<%= coupon.discount %>" hidden>
                                     <input name="total" type="text" value="<%= total %>" placeholder="Total" required>
                                 </div>
                                 <button type="submit" class="site-btn" >PLACE ORDER</button>
