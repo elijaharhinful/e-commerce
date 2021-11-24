@@ -80,39 +80,6 @@ router.get('/my_cart', function (req, res) {
 
 });
 
-/*
- * POST coupon code form
- */
-router.post('/coupon', function (req, res) {
-    let coupon = req.body.coupon;
-
-    Coupon.findOne({
-        title: coupon
-    }, function (err, coupon) {
-        if (coupon) {
-            req.flash('success', 'Coupon applied successfully! You will receive ' + coupon.discount + '% off your purchase when you place your order!');
-            res.render('checkout', {
-                title: 'Shopping Cart',
-                user: req.user,
-                cart: req.session.cart,
-                coupon: coupon
-            });
-        } else {
-            req.flash('danger', 'This coupon is not valid!');
-            res.render('checkout', {
-                title: 'Shopping Cart',
-                user: req.user,
-                cart: req.session.cart,
-                coupon: {
-                    title: null,
-                    discount: null
-                }
-            });
-        }
-    });
-
-});
-
 
 /*
  * GET update products in cart
@@ -164,7 +131,6 @@ router.get('/clear', function (req, res) {
 
 });
 
-
 /*
  * GET checkout page
  */
@@ -183,6 +149,39 @@ router.get('/checkout', function (req, res) {
             }
         });
     }
+
+});
+
+/*
+ * POST coupon code form
+ */
+router.post('/coupon', function (req, res) {
+    let coupon = req.body.coupon;
+
+    Coupon.findOne({
+        title: coupon
+    }, function (err, coupon) {
+        if (coupon) {
+            req.flash('success', 'Coupon applied successfully! You will receive ' + coupon.discount + '% off your purchase when you place your order!');
+            res.render('checkout', {
+                title: 'Shopping Cart',
+                user: req.user,
+                cart: req.session.cart,
+                coupon: coupon
+            });
+        } else {
+            req.flash('danger', 'This coupon is not valid!');
+            res.render('checkout', {
+                title: 'Shopping Cart',
+                user: req.user,
+                cart: req.session.cart,
+                coupon: {
+                    title: null,
+                    discount: null
+                }
+            });
+        }
+    });
 
 });
 
@@ -207,12 +206,10 @@ router.post('/checkout', function (req, res) {
     let options = {
         port: 443,
         headers: {
-            Authorization: 'Bearer '+process.env.PAYSTACK_SECRET_KEY,
+            Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY,
             'Content-Type': 'application/json'
         }
     }
-
-
     // this is to create an incomplete order. 
     // Move this to the paymwnt-complete GET request and change isPaid to true to make a complete order and also add transaction date to paidAt
     let order = new Order({
@@ -240,6 +237,19 @@ router.post('/checkout', function (req, res) {
         if (err) throw err;
     })
 
+
+    if (typeof req.session.ref == "undefined") {
+        req.session.ref = [];
+        req.session.ref.push({
+            ref: new_ref
+        });
+    } else {
+        req.session.ref.push({
+            ref: new_ref
+        });
+    }
+
+
     axios.post('https://api.paystack.co/transaction/initialize', params, options)
         .then(function (response) {
             res.redirect(response.data.data.authorization_url)
@@ -250,79 +260,50 @@ router.post('/checkout', function (req, res) {
 
 });
 
-
 /*
  * GET payment complete page
  */
-router.get('/payment-complete', async function (req, res) {
-    if (err) console.log(err); 
-        res.render('payment_complete', {
-            title: "Payment Complete"
-        });
-    });
-/*
- * GET payment complete page
- */
-// router.get('/payment-complete/:trxref/:reference', async function (req, res) {
-//     console.log(req.params)
-//     if (res.locals.user) {
-//         await axios.get('https://api.paystack.co/transaction/verify/:reference')
-//             .then(function (response) {
-//                 console.log(response.data)
-//                 res.render('payment_complete', {
-//                     user: req.user,
-//                     title: "Payment Complete"
-//                 });
-//                 // res.redirect(response.data.data.authorization_url)
-//             })
-//             .catch(function (error) {
-//                 console.log(error);
-//             });
-
-//     } else {
-//         res.render('payment_complete', {
-//             title: "Payment Complete"
-//         });
-//     }
-// });
-
-
-/*
- * GET payment complete page
- */
-
 // router.get('/payment-complete', async function (req, res) {
-//     console.log(req.params)
-
-// let config = {
-//         port: 443,
-//         headers: {
-//             Authorization: 'Bearer '+process.env.PAYSTACK_SECRET_KEY
-//         },
-//         params:{reference: req.session.ref.ref}
-//     }
-
-//     if (res.locals.user){
-//         await axios.get('https://api.paystack.co/transaction/verify/:reference',config)
-//         .then(function (response) {
-//             console.log(response.data)
-//             res.render('payment_complete',{
-//                 user : req.user,
-//                 title : "Payment Complete"
-//             });
-//             // res.redirect(response.data.data.authorization_url)
-//         })
-//         .catch(function (error) {
-//             console.log(error);
-//         });
-        
-//     }else{
-//         res.render('payment_complete',{
-//             title : "Payment Complete"
-//         });
-//     }
+//     if (err) console.log(err);
+//     res.render('payment_complete', {
+//         title: "Payment Complete"
+//     });
 // });
+/*
+ * GET payment complete page
+ */
 
+router.get('/payment-complete', async function (req, res) {
+    console.log(req.query)
+
+let config = {
+        port: 443,
+        headers: {
+            Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY
+        },
+        params:{reference: req.query.reference}
+    }
+
+    if (res.locals.user){
+        await axios.get('https://api.paystack.co/transaction/verify/${ref}',config)
+        .then(function (response) {
+            console.log(response.data)
+            res.render('payment_complete',{
+                user : req.user,
+                title : "Payment Complete"
+            });
+            // res.redirect(response.data.data.authorization_url)
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+        
+    }else{
+        res.render('payment_complete',{
+            title : "Payment Complete"
+        });
+    }
+});
 
 // Exports
 module.exports = router;
