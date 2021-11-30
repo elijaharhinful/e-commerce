@@ -78,7 +78,7 @@
                                 </i>
                                 Edit
                             </a>
-                            <a class="btn btn-danger btn-sm" href="/admin/dashboard/delete-page/<%= page._id %>">
+                            <a class="btn btn-danger btn-sm confirmDeletion" href="/admin/dashboard/delete-page/<%= page._id %>">
                                 <i class="fas fa-trash">
                                 </i>
                                 Delete
@@ -113,6 +113,11 @@
             }
 
         });
+
+        $('a.confirmDeletion').on('click', function () {
+        if (!confirm('Are you sure you want to delete product?'))
+            return false;
+    });
     </script>
 
 </html>

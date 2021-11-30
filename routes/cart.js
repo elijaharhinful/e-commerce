@@ -164,7 +164,7 @@ router.post('/coupon', function (req, res) {
         if (coupon) {
             req.flash('success', 'Coupon applied successfully! You will receive ' + coupon.discount + '% off your purchase when you place your order!');
             res.render('checkout', {
-                title: 'Shopping Cart',
+                title: 'Checkout',
                 user: req.user,
                 cart: req.session.cart,
                 coupon: coupon
@@ -172,7 +172,7 @@ router.post('/coupon', function (req, res) {
         } else {
             req.flash('danger', 'This coupon is not valid!');
             res.render('checkout', {
-                title: 'Shopping Cart',
+                title: 'Checkout',
                 user: req.user,
                 cart: req.session.cart,
                 coupon: {

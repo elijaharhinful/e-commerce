@@ -153,7 +153,7 @@ router.post('/add-product',  function (req, res) {
                     }
 
                     req.flash('success', 'Product added!');
-                    res.redirect('/admin/Dashboard');
+                    res.redirect('/admin/dashboard/products');
                 });
             }
         });
@@ -360,7 +360,7 @@ router.get('/delete-product/:id',isAdmin,  function (req, res) {
             });
             
             req.flash('success', 'Product deleted!');
-            res.redirect('/admin/dashboard');
+            res.redirect('/admin/dashboard/products');
         }
     });
 

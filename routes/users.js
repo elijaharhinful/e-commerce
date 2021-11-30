@@ -21,6 +21,45 @@ let Token = require('../models/token');
 // OAuth2_client.setCredentials( { refresh_token : process.env.REFRESH_TOKEN } )
 // const accessToken = OAuth2_client.getAccessToken()
 
+
+/*
+ * GET create admin
+ */
+router.get('/createadmin', async (req, res) => {
+    let adminPass = 'admin';
+
+    try {
+      const user = new User({
+        name: 'Admin',
+        username: 'admin',
+        email: 'admin@gmail.com',
+        password: 'admin',
+        admin: true,
+        isVerified: true
+      });
+      bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(adminPass, salt, function (err, hash) {
+            if (err)
+                console.log(err);
+
+            user.password = hash;
+
+            user.save(function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    req.flash('success', 'Admin account created. Login to continue!');
+                    res.redirect('/users/login')
+                }
+            });
+        });
+    });
+    } catch (error) {
+        req.flash('danger', 'Failed to create Admin account!');
+        res.redirect('/users/login')
+    }
+  });
+
 /*
  * GET register
  */
@@ -59,7 +98,7 @@ router.post('/register', function (req, res) {
         });
     } else {
         User.findOne({
-            username: username
+            email: email
         }, function (err, user) {
             if (err)
                 console.log(err);

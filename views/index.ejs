@@ -70,9 +70,57 @@
                                         <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
                                     </ul>
                                 </div>
-                                <div class="product__item__text">
+                                <div class="product__item__text ">
                                     <h6><%= p.title.toUpperCase() %></h6>
                                     <a href="/cart/add/<%= p.slug %>" class="add-cart">+ Add To Cart</a>
+                                    <div class="rating" >
+                                        <% if (p.rating == 1 && p.rating < 1.5){ %>
+                                        <i class="fa fa-star" ></i>
+                                        <% }else if (p.rating == 1.5 && p.rating < 2) {%>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-half-o"></i>
+                                        <% }else if (p.rating == 2 && p.rating < 2.5){ %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <% } else if (p.rating == 2.5 && p.rating < 3) { %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-half-o"></i>
+                                        <% }else if (p.rating == 3 && p.rating < 3.5){ %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <% }else if (p.rating == 3.5 && p.rating < 4){ %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-half-o"></i>
+                                        <% }else if (p.rating == 4 && p.rating < 4.5){ %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <% }else if (p.rating == 4.5 && p.rating < 5){ %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star-half-o"></i>
+                                        <% }else if (p.rating == 5){ %>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <% }else{ %> 
+                                            <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <i class="fa fa-star-o"></i>
+                                        <% } %>
+                                        <span> - <%=p.numReviews %> Review(s)</span>
+                                    </div>
                                     <h5>₵<%= parseFloat(p.price).toFixed(2) %></h5>
                                 </div>
                                 <div class="product__item">

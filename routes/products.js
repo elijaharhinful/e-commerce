@@ -82,13 +82,13 @@ router.get('/:category/:product', function (req, res) {
     let loggedIn = (req.isAuthenticated()) ? true : false;
 
     Product.findOne({
-        slug: req.params.product
+        slug: req.params.product.toLowerCase()
     }, function (err, product) {
         if (err) {
             console.log(err);
         } else {
 
-            let categorySlug = req.params.category;
+            let categorySlug = req.params.category.toLowerCase();
 
             Category.findOne({
                 slug: categorySlug
@@ -128,7 +128,8 @@ router.get('/:category/:product', function (req, res) {
                                 tab_id_array: tab_id_array,
                                 loggedIn: loggedIn,
                                 c_title: c.title,
-                                products: products
+                                products: products,
+                                reviews : product.reviews
                             });
                         }
                     });
@@ -140,6 +141,45 @@ router.get('/:category/:product', function (req, res) {
         }
     });
 
+});
+
+/*
+* POST product review
+*/
+router.post('/:category/:product/review/:id',  function(req,res){
+    
+    let review = {
+        name: req.body.name,
+        rating: Number(req.body.rating),
+        comment: req.body.comment
+    }
+    
+      Product.findById(req.params.id,
+        function(err,product){
+            
+            if (err) console.log(err);
+            
+            if (product){
+                product.reviews.push(review);
+                product.numReviews = product.reviews.length;
+                product.rating =
+                product.reviews.reduce((a, c) => c.rating + a, 0) /
+                product.reviews.length;
+
+
+                product.save(function(err){
+                    if (err){
+                        console.log(err);
+                    }else{
+                        req.flash('success', 'Review saved successfully!');
+                        res.redirect('/products/' +req.params.category.toLowerCase() +'/' + req.params.product.toLowerCase() );
+                    }
+                })
+            } else {
+                req.flash('danger', 'Product not found!');
+                res.redirect('/products/' +req.params.category.toLowerCase() +'/' + req.params.product.toLowerCase() );
+            };
+    });
 });
 
 // Exports

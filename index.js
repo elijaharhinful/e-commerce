@@ -183,6 +183,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/analytics', (req, res, next) => {
+  let x = require('./routes/analytics.js');
+  let y = x.getTotalRequests;
+      res.render('analytics',{some : y });
+});
+
 
 // Set routes 
 const pages = require('./routes/pages.js');
@@ -194,7 +200,7 @@ const adminCategories = require('./routes/admin_categories.js');
 const adminProducts = require('./routes/admin_products.js');
 const adminCoupons = require('./routes/admin_coupons.js');
 const adminOther = require('./routes/admin_other.js');
-const adminAnalytics = require('./routes/analytics.js');
+// const adminAnalytics = require('./routes/analytics.js');
 
 
 
@@ -203,7 +209,7 @@ app.use('/admin/dashboard', adminCategories);
 app.use('/admin/dashboard', adminProducts);
 app.use('/admin/dashboard', adminCoupons);
 app.use('/admin/dashboard', adminOther);
-app.use('/admin/dashboard', adminAnalytics);
+// app.use('/admin/dashboard', adminAnalytics);
 app.use('/products', products);
 app.use('/cart', cart);
 app.use('/users', users);

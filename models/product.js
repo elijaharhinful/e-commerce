@@ -1,8 +1,29 @@
 let mongoose = require('mongoose');
 
+//review Schema
+let reviewSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        default: 0
+    },
+    comment: {
+        type: String,
+        required: true
+    },
+    timeCreated: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+});
+
 // Product Schema
 let ProductSchema = mongoose.Schema({
-   
+
     title: {
         type: String,
         required: true
@@ -25,26 +46,30 @@ let ProductSchema = mongoose.Schema({
     image: {
         type: String
     },
-    reviews: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        review: String
-    }],
-    ratings: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        rating: String
-    }],
-    quantity: {
-        type: Number,
-        required: true
-    },
     discount: {
         type: Number
-    },createdBy: {
+    },
+    rating: {
+        type: Number,
+        default: 0,
+        required: true
+    },
+    numReviews: {
+        type: Number,
+        default: 0,
+        required: true
+    },
+    reviews: [reviewSchema],
+    quantity: {
+        type: Number,
+        required: true,
+        default: 100
+    },
+    createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin'
-    },createdAt: {
+    },
+    createdAt: {
         type: Date,
         required: true,
         default: Date.now
@@ -54,8 +79,7 @@ let ProductSchema = mongoose.Schema({
         required: true,
         default: Date.now
     }
-    
+
 });
 
 let Product = module.exports = mongoose.model('Product', ProductSchema);
-

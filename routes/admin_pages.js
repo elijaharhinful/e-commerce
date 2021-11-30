@@ -24,27 +24,42 @@ router.get('/', isAdmin, function (req, res) {
     }, function (err, counter) {
         if (err) throw err;
         if (!counter) {
-            console.log('unable to fetch counter data');
+            console.log('Unable to fetch counter data');
+
+            req.flash('danger', 'Unable to fetch counter data!');
+            res.redirect('/admin/dashboard/pages');
         } else {
             User.count({}, function (err, users) {
                 if (err) throw err;
                 if (!users) {
                     console.log('unable to fetch user data');
+
+                    req.flash('danger', 'Unable to fetch user data!');
+                    res.redirect('/admin/dashboard/pages');
                 } else {
                     Order.count({}, function (err, orders) {
                         if (err) throw err;
                         if (!orders) {
                             console.log('unable to fetch order data');
+
+                            req.flash('danger', 'Unable to fetch orders!');
+                            res.redirect('/admin/dashboard/pages');
                         } else {
                             Product.count({}, function (err, products) {
                                 if (err) throw err;
                                 if (!products) {
                                     console.log('unable to fetch product data');
+
+                                    req.flash('danger', 'Unable to fetch products data!');
+                                    res.redirect('/admin/dashboard/pages');
                                 } else {
                                     Category.count({}, function (err, categories) {
                                         if (err) throw err;
                                         if (!categories) {
                                             console.log('unable to fetch category data');
+
+                                            req.flash('danger', 'Unable to fetch categories!');
+                                            res.redirect('/admin/dashboard/pages');
                                         } else {
                                             res.render('admin/dashboard', {
                                                 counter: counter.count,
