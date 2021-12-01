@@ -274,7 +274,8 @@ router.post('/checkout', function (req, res) {
  */
 
 router.get('/payment-complete', async function (req, res) {
-    console.log(req.query)
+    console.log("params=> " + req.query)
+    let ref = req.query.reference;
 
 let config = {
         port: 443,
@@ -287,7 +288,7 @@ let config = {
     if (res.locals.user){
         await axios.get('https://api.paystack.co/transaction/verify/${ref}',config)
         .then(function (response) {
-            console.log(response.data)
+            console.log("response=> " + response.data)
             res.render('payment_complete',{
                 user : req.user,
                 title : "Payment Complete"
