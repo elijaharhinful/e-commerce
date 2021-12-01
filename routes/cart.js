@@ -296,21 +296,32 @@ let config = {
                         req.flash('danger', 'Order update failed!');
                         res.redirect('/cart/payment_failed');
                     }else{
-                        let paymentId = response.data.data.id
+                        let paymentId = response.data.data.id;
                         let payerId = response.data.data.customer.id;
-                        res.render('payment_complete',{
-                            user : req.user,
-                            title : "Payment Complete"
+                        order.payment.paymentId = paymentId;
+                        order.payment.payerId = payerId;
+                        order.isPaid = "true";
+                        order.payment.reference = response.data.data.reference;
+
+                        order.save(function(err){
+                            if (err){
+                                console.log(err)
+                            }else{
+                                res.render('payment_complete',{
+                                    user : req.user,
+                                    title : "Payment Complete"
+                                });
+                            };
                         });
-                    }
-                })
+                    };
+                });
                 
             } else{
                 res.render('payment_failed',{
                     user : req.user,
                     title : "Order failed"
                 });
-            }
+            };
             
             // res.redirect(response.data.data.authorization_url)
         })
