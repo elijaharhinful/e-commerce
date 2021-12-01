@@ -274,21 +274,20 @@ router.post('/checkout', function (req, res) {
  */
 
 router.get('/payment-complete', async function (req, res) {
-    console.log("params=> " + req.query)
+    console.log(req.query)
     let ref = req.query.reference;
 
 let config = {
         port: 443,
         headers: {
             Authorization: 'Bearer ' + process.env.PAYSTACK_SECRET_KEY
-        },
-        params:{reference: req.query.reference}
+        }
     }
 
     if (res.locals.user){
         await axios.get('https://api.paystack.co/transaction/verify/${ref}',config)
         .then(function (response) {
-            console.log("response=> " + response.data)
+            console.log(response.data.data)
             res.render('payment_complete',{
                 user : req.user,
                 title : "Payment Complete"
