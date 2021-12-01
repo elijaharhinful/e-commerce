@@ -289,7 +289,7 @@ let config = {
         .then(function (response) {
             console.log(response.data)
             if (response.data.status == true){
-                await Order.findOneAndUpdate({paymentId:response.data.data.reference},{isPaid: "true"},function(err){
+                Order.findOneAndUpdate({paymentId:response.data.data.reference},{isPaid: "true"},function(err){
                     if (err){
                         console.log(err)
                     }else{
