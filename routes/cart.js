@@ -288,10 +288,25 @@ let config = {
         await axios.get('https://api.paystack.co/transaction/verify/'+ref ,config)
         .then(function (response) {
             console.log(response.data)
-            res.render('payment_complete',{
-                user : req.user,
-                title : "Payment Complete"
-            });
+            if (response.data.status == true){
+                await Order.findOneAndUpdate({paymentId:response.data.data.reference},{isPaid: "true"},function(err){
+                    if (err){
+                        console.log(err)
+                    }else{
+                        res.render('payment_complete',{
+                            user : req.user,
+                            title : "Payment Complete"
+                        });
+                    }
+                })
+                
+            } else{
+                res.render('payment_failed',{
+                    user : req.user,
+                    title : "Order failed"
+                });
+            }
+            
             // res.redirect(response.data.data.authorization_url)
         })
         .catch(function (error) {
