@@ -289,10 +289,15 @@ let config = {
         .then(function (response) {
             console.log(response.data)
             if (response.data.status == true){
-                Order.findOneAndUpdate({paymentId:response.data.data.reference},{isPaid: "true"},function(err){
-                    if (err){
-                        console.log(err)
+                Order.findOne({paymentId:response.data.data.reference},function(err,order){
+                    if (err)
+                        console.log(err);
+                    if (!order){
+                        req.flash('danger', 'Order update failed!');
+                        res.redirect('/cart/payment_failed');
                     }else{
+                        let paymentId = response.data.data.id
+                        let payerId = response.data.data.customer.id;
                         res.render('payment_complete',{
                             user : req.user,
                             title : "Payment Complete"
