@@ -289,7 +289,7 @@ let config = {
         .then(function (response) {
             console.log(response.data)
             if (response.data.status == true){
-                Order.findOne({paymentId:response.data.data.reference},function(err,order){
+                Order.findOne({"payment.paymentId":response.data.data.reference},function(err,order){
                     if (err)
                         console.log(err);
                     if (!order){
