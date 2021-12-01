@@ -285,9 +285,9 @@ let config = {
     }
 
     if (res.locals.user){
-        await axios.get('https://api.paystack.co/transaction/verify/${ref}',config)
+        await axios.get('https://api.paystack.co/transaction/verify/'+ref ,config)
         .then(function (response) {
-            console.log(response.data.data)
+            console.log(response.data)
             res.render('payment_complete',{
                 user : req.user,
                 title : "Payment Complete"
