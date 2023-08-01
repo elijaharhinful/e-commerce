@@ -29,7 +29,7 @@ router.get('/', function (req, res) {
             }, function (err, page) {
                 if (err)
                     console.log(err);
-        
+                    console.log(page);
                     let perPage = 12;
                     let pageNumber = (req.query.page == null) ? 1 : req.query.page;
                     let startFrom = (pageNumber - 1) * perPage;
