@@ -29,11 +29,8 @@ router.get('/', function (req, res) {
             }, function (err, page) {
                 if (err)
                     console.log(err);
-<<<<<<< HEAD
                     
-=======
                 
->>>>>>> fb50fb362487ec90ff3c715c7f2963203f741f93
                     let perPage = 12;
                     let pageNumber = (req.query.page == null) ? 1 : req.query.page;
                     let startFrom = (pageNumber - 1) * perPage;
