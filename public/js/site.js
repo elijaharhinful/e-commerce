@@ -169,7 +169,7 @@ $(function () {
     });
 
     /*------------------
-        PAystack Integration
+        Paystack Integration
     --------------------*/
     // const paymentForm = document.getElementById('paymentForm');
     // paymentForm.addEventListener("submit", payWithPaystack, false);

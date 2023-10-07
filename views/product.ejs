@@ -76,8 +76,13 @@
                     <div class="col-lg-8">
                         <div class="product__details__text">
                             <h4><%=p.title %></h4>
-                            <h3>₵<%= parseFloat(p.price).toFixed(2) %><span>70.00</span></h3>
+                            <h3>₵<%= parseFloat(p.price).toFixed(2) %><span><%= parseFloat(p.initialPrice).toFixed(2) %></span></h3>
                             <p><%= p.desc %></p>
+                            <% if (p.quantity >= 1 ){ %>
+                            <p><i>In stock : <%=p.quantity %> </i></p>
+                            <%} else{ %>
+                                <p><i>Out of stock</i></p>
+                            <%} %>
                             
                             <%- include('partials/ratings'); %>
 

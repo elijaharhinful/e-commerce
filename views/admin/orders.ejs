@@ -43,7 +43,9 @@
                                         <tr class="text-center">
                                             <th>#</th>
                                             <th>Name</th>
+                                            <th>OrderID</th>
                                             <th>Reference</th>
+                                            <th>PaymentId</th>
                                             <th>Paid</th>
                                             <th>Address</th>
                                             <th>Action</th>
@@ -54,7 +56,9 @@
                                         <tr class="text-center">
                                             <td>#</td>
                                             <td><%= order.name %></td>
+                                            <td><%= order.payment.transactionId %></td>
                                             <td><%= order.payment.reference %></td>
+                                            <td><%= order.payment.PaymentId %></td>
                                             <td><%= order.isPaid %></td>
                                             <td><%= order.shipping.address %></td>
                                             <td class="project-actions text-center">
@@ -73,6 +77,7 @@
                                             <th>#</th>
                                             <th>Name</th>
                                             <th>Reference</th>
+                                            <th>PaymentId</th>
                                             <th>Paid</th>
                                             <th>Address</th>
                                             <th>Action</th>

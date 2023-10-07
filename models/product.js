@@ -39,6 +39,10 @@ let ProductSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    initialPrice : {
+        type: Number,
+        required: true
+    },
     price: {
         type: Number,
         required: true

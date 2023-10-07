@@ -103,7 +103,7 @@
                                 <% let delivery = 5.00 %>
                                 <% let discount = 0 %>
                                 <h4 class="order__title">Your order</h4>
-                                <div class="checkout__order__products">Product <span>Total</span></div>
+                                <div class="checkout__order__products">Product (Qty)<span>Total</span></div>
                                 <ol class="checkout__total__products">
                                     <% cart.forEach(function(product,index){ %> 
                                         <% let ind_pdt_total = 0 %>
@@ -113,7 +113,7 @@
                                         <% ind_pdt_total += +multiply %>
 
                                         <% sub_total += +ind_pdt_total %>
-                                        <li><%= index_increase %>. <%= product.title %><span>₵ <%= ind_pdt_total %></span></li> 
+                                        <li><%= index_increase %>. <%= product.title %> (<%=product.qty %>)<span>₵ <%= ind_pdt_total %></span></li> 
                                     <%})%>
                                 </ol>
                                 <ul class="checkout__total__all">
@@ -148,34 +148,6 @@
         </div>
     </section>
     <!-- Checkout Section End -->
-    <!-- <script src="https://js.paystack.co/v1/inline.js">
-    
-    /*------------------
-        PAystack Integration
-    --------------------*/
-    const paymentForm = document.getElementById('paymentForm');
-    paymentForm.addEventListener("submit", payWithPaystack, false);
-
-    function payWithPaystack(e) {
-        e.preventDefault();
-        alert('working');
-        let handler = PaystackPop.setup({
-            key: 'pk_test_d0509bf6287860b8ecce4fb62bcaa9bd34be997b', // Replace with your public key
-            email: document.getElementById("email-address").value,
-            amount: document.getElementById("amount").value * 100,
-            ref: '' + Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
-            // label: "Optional string that replaces customer email"
-            onClose: function () {
-                alert('Window closed.');
-            },
-            callback: function (response) {
-                let message = 'Payment complete! Reference: ' + response.reference;
-                alert(message);
-            }
-        });
-        handler.openIframe();
-    }
-    </script>  -->
 
     <%- include('layouts/footer'); %>
 </body>

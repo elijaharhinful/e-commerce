@@ -1,159 +1,160 @@
-require('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const router = express.Router();
-const passport = require('passport');
-const bcrypt = require('bcryptjs');
-const async = require('async');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const sgMail = require('@sendgrid/mail');
-const { google } = require('googleapis');
-const OAuth2 = google.auth.OAuth2
+const passport = require("passport");
+const bcrypt = require("bcryptjs");
+const async = require("async");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
 // Get Users model
-let User = require('../models/user');
+let User = require("../models/user");
 
 // Get Tokens model
-let Token = require('../models/token');
-
+let Token = require("../models/token");
 
 // const OAuth2_client = new OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
 // OAuth2_client.setCredentials( { refresh_token : process.env.REFRESH_TOKEN } )
 // const accessToken = OAuth2_client.getAccessToken()
 
-
 /*
  * GET create admin
  */
-router.get('/createadmin', async (req, res) => {
-    let adminPass = 'admin';
+router.get("/createadmin", async (req, res) => {
+  let adminPass = "admin";
 
-    try {
-      const user = new User({
-        name: 'Admin',
-        username: 'admin',
-        email: 'admin@gmail.com',
-        password: 'admin',
-        admin: true,
-        isVerified: true
-      });
-      bcrypt.genSalt(10, function (err, salt) {
-        bcrypt.hash(adminPass, salt, function (err, hash) {
-            if (err)
-                console.log(err);
-
-            user.password = hash;
-
-            user.save(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    req.flash('success', 'Admin account created. Login to continue!');
-                    res.redirect('/users/login')
-                }
-            });
-        });
+  try {
+    const user = new User({
+      name: "Admin",
+      username: "admin",
+      email: "admin@gmail.com",
+      password: "admin",
+      admin: true,
+      isVerified: true,
     });
-    } catch (error) {
-        req.flash('danger', 'Failed to create Admin account!');
-        res.redirect('/users/login')
-    }
-  });
+    bcrypt.genSalt(10, function (err, salt) {
+      bcrypt.hash(adminPass, salt, function (err, hash) {
+        if (err) console.log(err);
+
+        user.password = hash;
+
+        user.save(function (err) {
+          if (err) {
+            console.log(err);
+          } else {
+            req.flash("success", "Admin account created. Login to continue!");
+            res.redirect("/users/login");
+          }
+        });
+      });
+    });
+  } catch (error) {
+    req.flash("danger", "Failed to create Admin account!");
+    res.redirect("/users/login");
+  }
+});
 
 /*
  * GET register
  */
-router.get('/register', function (req, res) {
-
-    res.render('register', {
-        title: 'Register'
-    });
-
+router.get("/register", function (req, res) {
+  res.render("register", {
+    title: "Register",
+  });
 });
 
 /*
  * POST register
  */
-router.post('/register', function (req, res) {
+router.post("/register", function (req, res) {
+  let name = req.body.name;
+  let email = req.body.email;
+  let username = req.body.username;
+  let password = req.body.password;
+  let password2 = req.body.password2;
 
-    let name = req.body.name;
-    let email = req.body.email;
-    let username = req.body.username;
-    let password = req.body.password;
-    let password2 = req.body.password2;
+  req.checkBody("name", "Name is required!").notEmpty();
+  req.checkBody("email", "Email is required!").isEmail();
+  req.checkBody("username", "Username is required!").notEmpty();
+  req.checkBody("password", "Password is required!").notEmpty();
+  req.checkBody("password2", "Passwords do not match!").equals(password);
 
-    req.checkBody('name', 'Name is required!').notEmpty();
-    req.checkBody('email', 'Email is required!').isEmail();
-    req.checkBody('username', 'Username is required!').notEmpty();
-    req.checkBody('password', 'Password is required!').notEmpty();
-    req.checkBody('password2', 'Passwords do not match!').equals(password);
+  let errors = req.validationErrors();
 
-    let errors = req.validationErrors();
+  if (errors) {
+    res.render("register", {
+      errors: errors,
+      user: null,
+      title: "Register",
+    });
+  } else {
+    User.findOne(
+      {
+        email: email,
+      },
+      function (err, user) {
+        if (err) console.log(err);
 
-    if (errors) {
-        res.render('register', {
-            errors: errors,
-            user: null,
-            title: 'Register'
-        });
-    } else {
-        User.findOne({
-            email: email
-        }, function (err, user) {
-            if (err)
-                console.log(err);
-
-            if (user) {
-                if (user.email === email) {
-                    if (user.isVerified === false) {
-                        req.flash('danger', 'There is an account with this email address but it is not verified. Verify account to continue!');
-                        res.redirect('/users/token-resend');
-                    } else {
-                        req.flash('danger', 'There is an account with this email address, choose another one or login to continue!');
-                        res.redirect('/users/register');
-                    }
-                } else {
-                    req.flash('danger', 'Username exists, choose another!');
-                    res.redirect('/users/register');
-                }
+        if (user) {
+          if (user.email === email) {
+            if (user.isVerified === false) {
+              req.flash(
+                "danger",
+                "There is an account with this email address but it is not verified. Verify account to continue!"
+              );
+              res.redirect("/users/token-resend");
             } else {
-                let user = new User({
-                    name: name,
-                    email: email,
-                    username: username,
-                    password: password
-                });
+              req.flash(
+                "danger",
+                "There is an account with this email address, choose another one or login to continue!"
+              );
+              res.redirect("/users/register");
+            }
+          } else {
+            req.flash("danger", "Username exists, choose another!");
+            res.redirect("/users/register");
+          }
+        } else {
+          let user = new User({
+            name: name,
+            email: email,
+            username: username,
+            password: password,
+          });
 
-                bcrypt.genSalt(10, function (err, salt) {
-                    bcrypt.hash(user.password, salt, function (err, hash) {
-                        if (err)
-                            console.log(err);
+          bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(user.password, salt, function (err, hash) {
+              if (err) console.log(err);
 
-                        user.password = hash;
+              user.password = hash;
 
-                        user.save(function (err) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                crypto.randomBytes(16, function (err, buf) {
+              user.save(function (err) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  crypto.randomBytes(16, function (err, buf) {
+                    if (err) console.log(err);
 
-                                    if (err) console.log(err);
+                    let token = new Token({
+                      userId: user.id,
+                      token: buf.toString("hex"),
+                    });
 
-                                    let token = new Token({
-                                        userId: user.id,
-                                        token: buf.toString('hex')
-                                    });
-
-                                    token.save(function (err) {
-                                        if (err) {
-                                            console.log(err);
-                                        } 
-                                        else {
-                                            
-                                            let href = {
-                                                href : "https://" +req.headers.host+ "/users/confirm-email/"+token.token
-                                            };
-                                            let htmlTemplate = `
+                    token.save(function (err) {
+                      if (err) {
+                        console.log(err);
+                      } else {
+                        let href = {
+                          href:
+                            "https://" +
+                            req.headers.host +
+                            "/users/confirm-email/" +
+                            token.token,
+                        };
+                        let htmlTemplate = `
                                             <!DOCTYPE html>
                                             <html>
                                             <body>
@@ -168,160 +169,180 @@ router.post('/register', function (req, res) {
                                             </body>
                                             </html>
                                     `;
-                                            async function sender(){
-                                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-                                            const msg = {
-                                                to: user.email,
-                                                from: process.env.MAIL_USERNAME, 
-                                                subject: 'Verify your My Website email',
-                                                html: htmlTemplate
-                                            };
-                                            (async () => {
-                                                try {
-                                                    await sgMail.send(msg);
-                                                    
-                                                    req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
-                                                res.redirect('/users/register-token')
-                                                } catch (error) {
-                                                    console.error(error);
+                        async function sender() {
+                          sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                          const msg = {
+                            to: user.email,
+                            from: process.env.MAIL_USERNAME,
+                            subject: "Verify your My Website email",
+                            html: htmlTemplate,
+                          };
+                          (async () => {
+                            try {
+                              await sgMail.send(msg);
 
-                                                    if (error.response) {
-                                                        console.error(error.response.body)
-                                                    }
-                                                }
-                                            })()
-                                            }
-                                            sender().catch(console.error);
-                                        }
-                                    });
+                              req.flash(
+                                "info",
+                                "A verification e-mail has been sent to " +
+                                  user.email +
+                                  " with further instructions."
+                              );
+                              res.redirect("/users/register-token");
+                            } catch (error) {
+                              console.error(error);
 
-                                });
+                              if (error.response) {
+                                console.error(error.response.body);
+                              }
                             }
-                        });
+                          })();
+                        }
+                        sender().catch(console.error);
+                      }
                     });
-                });
-            }
-        });
-    }
-
+                  });
+                }
+              });
+            });
+          });
+        }
+      }
+    );
+  }
 });
 
 /*
  * GET Register token page
  */
-router.get('/register-token', function (req, res) {
-    res.render('register-token', {
-        title: 'Verify Account'
-    })
-})
+router.get("/register-token", function (req, res) {
+  res.render("register-token", {
+    title: "Verify Account",
+  });
+});
 
 /*
  * GET confirm email
  */
-router.get('/confirm-email', function (req, res) {
-    res.render('confirm-email', {
-        title: 'Confirm email'
-    })
-})
+router.get("/confirm-email", function (req, res) {
+  res.render("confirm-email", {
+    title: "Confirm email",
+  });
+});
 
 /*
  * GET confirm email token
  */
-router.get('/confirm-email/:token', function (req, res) {
-    Token.findOne({
-        token: req.params.token
-    }, function (err, token) {
-        if (err) console.log(err);
+router.get("/confirm-email/:token", function (req, res) {
+  Token.findOne(
+    {
+      token: req.params.token,
+    },
+    function (err, token) {
+      if (err) console.log(err);
 
-        if (!token) {
-            req.flash('danger', 'Token is invalid or may have expired!');
-            res.redirect('/users/token-resend');
-        } else {
-            if (token) {
-                User.findById(token.userId, function (err, user) {
-                    if (err) console.log(err);
+      if (!token) {
+        req.flash("danger", "Token is invalid or may have expired!");
+        res.redirect("/users/token-resend");
+      } else {
+        if (token) {
+          User.findById(token.userId, function (err, user) {
+            if (err) console.log(err);
 
-                    if (!user) {
-                        req.flash('danger', 'We are unable to find a user for this token!');
-                        res.redirect('/users/register');
-                    } else if (user.isVerified) {
-                        req.flash('danger', 'This user has already been verified. Please login to continue!');
-                        res.redirect('/users/login');
-                    } else {
-                        user.isVerified = true;
-                        user.save(function (err) {
-                            if (err) console.log(err);
+            if (!user) {
+              req.flash(
+                "danger",
+                "We are unable to find a user for this token!"
+              );
+              res.redirect("/users/register");
+            } else if (user.isVerified) {
+              req.flash(
+                "danger",
+                "This user has already been verified. Please login to continue!"
+              );
+              res.redirect("/users/login");
+            } else {
+              user.isVerified = true;
+              user.save(function (err) {
+                if (err) console.log(err);
 
-                            req.flash('success', 'This account has been verified. Please login to continue!');
-                            res.redirect('/users/confirm-email');
-                        })
-                    }
-                })
+                req.flash(
+                  "success",
+                  "This account has been verified. Please login to continue!"
+                );
+                res.redirect("/users/confirm-email");
+              });
             }
+          });
         }
-
-
-    })
+      }
+    }
+  );
 });
 
 /*
  * GET token resend for registration confirmation
  */
-router.get('/token-resend', function (req, res) {
-    res.render('token-resend', {
-        title: 'Token Resend'
-    })
+router.get("/token-resend", function (req, res) {
+  res.render("token-resend", {
+    title: "Token Resend",
+  });
 });
 
 /*
  * POST token resend for registration
  */
-router.post('/token-resend', function (req, res) {
-    let email = req.body.email;
+router.post("/token-resend", function (req, res) {
+  let email = req.body.email;
 
-    req.checkBody('email', 'Email is not valid!').isEmail();
-    req.checkBody('email', 'Email is required!').notEmpty();
+  req.checkBody("email", "Email is not valid!").isEmail();
+  req.checkBody("email", "Email is required!").notEmpty();
 
-    let errors = req.validationErrors();
+  let errors = req.validationErrors();
 
-    if (errors) {
-        res.render('token-resend', {
-            errors: errors,
-            user: null,
-            title: 'token-resend'
-        });
-    } else {
-        User.findOne({
-            email: email
-        }, function (err, user) {
+  if (errors) {
+    res.render("token-resend", {
+      errors: errors,
+      user: null,
+      title: "token-resend",
+    });
+  } else {
+    User.findOne(
+      {
+        email: email,
+      },
+      function (err, user) {
+        if (err) console.log(err);
 
+        if (!user) {
+          req.flash("danger", "We are unable to find a user with this email!");
+          res.redirect("/users/register");
+        } else if (user.isVerified) {
+          req.flash(
+            "danger",
+            "This user has already been verified. Please login to continue!"
+          );
+          res.redirect("/users/login");
+        } else {
+          crypto.randomBytes(16, function (err, buf) {
             if (err) console.log(err);
 
-            if (!user) {
-                req.flash('danger', 'We are unable to find a user with this email!');
-                res.redirect('/users/register');
-            } else if (user.isVerified) {
-                req.flash('danger', 'This user has already been verified. Please login to continue!');
-                res.redirect('/users/login');
-            } else {
-                crypto.randomBytes(16, function (err, buf) {
+            let token = new Token({
+              userId: user.id,
+              token: buf.toString("hex"),
+            });
 
-                    if (err) console.log(err);
-
-                    let token = new Token({
-                        userId: user.id,
-                        token: buf.toString('hex')
-                    });
-
-                    token.save(function (err) {
-                        if (err) {
-                            console.log(err);
-                        } 
-                        else {
-                            let href = {
-                                href : "https://" +req.headers.host+ "/users/confirm-email/"+token.token
-                            };
-                            let htmlTemplate = `
+            token.save(function (err) {
+              if (err) {
+                console.log(err);
+              } else {
+                let href = {
+                  href:
+                    "https://" +
+                    req.headers.host +
+                    "/users/confirm-email/" +
+                    token.token,
+                };
+                let htmlTemplate = `
                             <!DOCTYPE html>
                             <html>
                             <body>
@@ -336,133 +357,128 @@ router.post('/token-resend', function (req, res) {
                             </body>
                             </html>
                     `;
-                            async function sender(){
-                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-                            const msg = {
-                                to: user.email,
-                                from: process.env.MAIL_USERNAME, 
-                                subject: 'Verify your My Website email',
-                                html: htmlTemplate
-                            };
-                            (async () => {
-                                try {
-                                    await sgMail.send(msg);
-                                    
-                                    req.flash('info', 'A verification e-mail has been sent to ' + user.email + ' with further instructions.');
-                                res.redirect('/users/register-token')
-                                } catch (error) {
-                                    console.error(error);
+                async function sender() {
+                  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                  
+                  const msg = {
+                    to: user.email,
+                    from: process.env.MAIL_USERNAME,
+                    subject: "Verify your My Website email",
+                    html: htmlTemplate,
+                  };
+                  
+                  (async () => {
+                    try {
+                      await sgMail.send(msg);
 
-                                    if (error.response) {
-                                        console.error(error.response.body)
-                                    }
-                                }
-                            })()
-                            }
-                            sender().catch(console.error);
-                        }
-                            
-                    });
+                      req.flash(
+                        "info",
+                        "A verification e-mail has been sent to " +
+                          user.email +
+                          " with further instructions."
+                      );
+                      res.redirect("/users/register-token");
+                    } catch (error) {
+                      console.error(error);
 
-                });
-            }
-        })
-    }
-
+                      if (error.response) {
+                        console.error(error.response.body);
+                      }
+                    }
+                  })();
+                }
+                sender().catch(console.error);
+              }
+            });
+          });
+        }
+      }
+    );
+  }
 });
 
 /*
  * GET login
  */
-router.get('/login', function (req, res) {
+router.get("/login", function (req, res) {
+  if (res.locals.user) res.redirect("/");
 
-    if (res.locals.user) res.redirect('/');
-
-    res.render('login', {
-        title: 'Log in'
-    });
-
+  res.render("login", {
+    title: "Log in",
+  });
 });
 
 /*
  * POST login
  */
-router.post('/login', function (req, res, next) {
-
-    passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/users/login',
-        isVerified: '/users/token-resend',
-        failureFlash: true
-    })(req, res, next);
-
+router.post("/login", function (req, res, next) {
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/users/login",
+    isVerified: "/users/token-resend",
+    failureFlash: true,
+  })(req, res, next);
 });
 
 /*
  * GET logout
  */
-router.get('/logout', function (req, res) {
+router.get("/logout", function (req, res) {
+  req.logout();
 
-    req.logout();
-
-    req.flash('success', 'You are logged out!');
-    res.redirect('/users/login');
-
+  req.flash("success", "You are logged out!");
+  res.redirect("/users/login");
 });
 
 /*
  * GET forgot password
  */
-router.get('/forgot', function (req, res) {
-
-    res.render('forgot', {
-        title: 'Forgot Password'
-    });
-
+router.get("/forgot", function (req, res) {
+  res.render("forgot", {
+    title: "Forgot Password",
+  });
 });
 
 /*
  * POST forgot password
  */
-router.post('/forgot', function (req, res) {
-    let email = req.body.email;
+router.post("/forgot", function (req, res) {
+  let email = req.body.email;
 
-    req.checkBody('email', 'Email is required!').isEmail();
+  req.checkBody("email", "Email is required!").isEmail();
 
-    let errors = req.validationErrors();
+  let errors = req.validationErrors();
 
-    if (errors) {
-        res.render('forgot', {
-            errors: errors,
-            user: null,
-            title: 'Forgot Password'
-        });
-    } else {
+  if (errors) {
+    res.render("forgot", {
+      errors: errors,
+      user: null,
+      title: "Forgot Password",
+    });
+  } else {
+    User.findOne(
+      {
+        email: email,
+      },
+      function (err, user) {
+        if (err) console.log(err);
 
-        User.findOne({
-            email: email
-        }, function (err, user) {
-            if (err)
+        if (!user) {
+          req.flash("danger", "Email does not exist, enter correct email!");
+          res.redirect("/users/forgot");
+        } else {
+          crypto.randomBytes(3, function (err, buf) {
+            let token = buf.toString("hex");
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 3600000; //one hour
+            user.save(function (err) {
+              if (err) {
                 console.log(err);
-
-            if (!user) {
-                req.flash('danger', 'Email does not exist, enter correct email!');
-                res.redirect('/users/forgot');
-            } else {
-
-                crypto.randomBytes(3, function (err, buf) {
-                    let token = buf.toString('hex');
-                    user.resetPasswordToken = token;
-                    user.resetPasswordExpires = Date.now() + 3600000; //one hour
-                    user.save(function (err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            let send_token = {
-                                token : token
-                            };
-                            let htmlTemplate = `
+              } else {
+                let send_token = {
+                  token: token,
+                };
+                let htmlTemplate = `
                             <!DOCTYPE html>
                             <html>
                             <body>
@@ -476,101 +492,98 @@ router.post('/forgot', function (req, res) {
                             </body>
                             </html>
                     `;
-                            async function sender(){
-                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-                            const msg = {
-                                to: user.email,
-                                from: process.env.MAIL_USERNAME, 
-                                subject: 'Verify your My Website email',
-                                html: htmlTemplate
-                            };
-                            (async () => {
-                                try {
-                                    await sgMail.send(msg);
-                                    
-                                    req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-                                res.render('token', {
-                                    title: "Token",
-                                    user: null,
-                                    user_id: user.id,
-                                    token: token
-                                });
-                                } catch (error) {
-                                    console.error(error);
+                async function sender() {
+                  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                  const msg = {
+                    to: user.email,
+                    from: process.env.MAIL_USERNAME,
+                    subject: "Verify your My Website email",
+                    html: htmlTemplate,
+                  };
+                  (async () => {
+                    try {
+                      await sgMail.send(msg);
 
-                                    if (error.response) {
-                                        console.error(error.response.body)
-                                    }
-                                }
-                            })()
-                            }
-                            sender().catch(console.error);
-                            
+                      req.flash(
+                        "info",
+                        "An e-mail has been sent to " +
+                          user.email +
+                          " with further instructions."
+                      );
+                      res.render("token", {
+                        title: "Token",
+                        user: null,
+                        user_id: user.id,
+                        token: token,
+                      });
+                    } catch (error) {
+                      console.error(error);
 
-                        } 
-                    });
-                });
-
-            };
-        });
-    }
-
+                      if (error.response) {
+                        console.error(error.response.body);
+                      }
+                    }
+                  })();
+                }
+                sender().catch(console.error);
+              }
+            });
+          });
+        }
+      }
+    );
+  }
 });
-
 
 /*
  * GET forgot password resend
  */
-router.get('/forgot-resend', function (req, res) {
-
-    res.render('forgot_resend', {
-        title: 'Forgot Password'
-    });
-
+router.get("/forgot-resend", function (req, res) {
+  res.render("forgot_resend", {
+    title: "Forgot Password",
+  });
 });
-
 
 /*
  * POST forgot-resend password reset token
  */
-router.post('/forgot-resend', function (req, res) {
-    let email = req.body.email;
+router.post("/forgot-resend", function (req, res) {
+  let email = req.body.email;
 
-    req.checkBody('email', 'Email is required!').isEmail();
+  req.checkBody("email", "Email is required!").isEmail();
 
-    let errors = req.validationErrors();
+  let errors = req.validationErrors();
 
-    if (errors) {
-        res.render('forgot_resend', {
-            errors: errors,
-            user: null,
-            title: 'Resend Password Token'
-        });
-    } else {
-        User.findOne({
-            email: email
-        }, function (err, user) {
-            if (err)
+  if (errors) {
+    res.render("forgot_resend", {
+      errors: errors,
+      user: null,
+      title: "Resend Password Token",
+    });
+  } else {
+    User.findOne(
+      {
+        email: email,
+      },
+      function (err, user) {
+        if (err) console.log(err);
+
+        if (!user) {
+          req.flash("danger", "Email does not exist, enter correct email!");
+          res.redirect("/users/forgot_resend");
+        } else {
+          crypto.randomBytes(3, function (err, buf) {
+            let token = buf.toString("hex");
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 3600000; //one hour
+            user.save(function (err) {
+              if (err) {
                 console.log(err);
-
-            if (!user) {
-                req.flash('danger', 'Email does not exist, enter correct email!');
-                res.redirect('/users/forgot_resend');
-            } else {
-
-                crypto.randomBytes(3, function (err, buf) {
-                    let token = buf.toString('hex');
-                    user.resetPasswordToken = token;
-                    user.resetPasswordExpires = Date.now() + 3600000; //one hour
-                    user.save(function (err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            let send_token = {
-                                token : token
-                            };
-                            let htmlTemplate = `
+              } else {
+                let send_token = {
+                  token: token,
+                };
+                let htmlTemplate = `
                             <!DOCTYPE html>
                             <html>
                             <body>
@@ -584,411 +597,394 @@ router.post('/forgot-resend', function (req, res) {
                             </body>
                             </html>
                     `;
-                            async function sender(){
-                                sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-                            const msg = {
-                                to: user.email,
-                                from: process.env.MAIL_USERNAME, 
-                                subject: 'Verify your My Website email',
-                                html: htmlTemplate
-                            };
-                            (async () => {
-                                try {
-                                    await sgMail.send(msg);
-                                    
-                                    req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-                                res.render('token', {
-                                    title: "Token",
-                                    user: null,
-                                    user_id: user.id,
-                                    token: token
-                                });
-                                } catch (error) {
-                                    console.error(error);
+                async function sender() {
+                  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                  const msg = {
+                    to: user.email,
+                    from: process.env.MAIL_USERNAME,
+                    subject: "Verify your My Website email",
+                    html: htmlTemplate,
+                  };
+                  (async () => {
+                    try {
+                      await sgMail.send(msg);
 
-                                    if (error.response) {
-                                        console.error(error.response.body)
-                                    }
-                                }
-                            })()
-                            }
-                            sender().catch(console.error);
-                        } 
-                    });
-                });
+                      req.flash(
+                        "info",
+                        "An e-mail has been sent to " +
+                          user.email +
+                          " with further instructions."
+                      );
+                      res.render("token", {
+                        title: "Token",
+                        user: null,
+                        user_id: user.id,
+                        token: token,
+                      });
+                    } catch (error) {
+                      console.error(error);
 
-            };
-        });
-    }
-
+                      if (error.response) {
+                        console.error(error.response.body);
+                      }
+                    }
+                  })();
+                }
+                sender().catch(console.error);
+              }
+            });
+          });
+        }
+      }
+    );
+  }
 });
-
-
 
 /*
  * GET token
  */
-router.get('/token', function (req, res) {
-    res.render('token', {
-        title: 'Token'
-    });
-
+router.get("/token", function (req, res) {
+  res.render("token", {
+    title: "Token",
+  });
 });
 
 /*
  * POST token
  */
-router.post('/token', function (req, res) {
+router.post("/token", function (req, res) {
+  let token = req.body.token;
 
-    let token = req.body.token;
+  req.checkBody("token", "Token is required!").isString();
 
-    req.checkBody('token', 'Token is required!').isString();
+  let errors = req.validationErrors();
 
-    let errors = req.validationErrors();
+  if (errors) {
+    User.findById(id, function (err, user) {
+      if (err) console.log(err);
+      console.log(user._id);
+      res.render("reset", {
+        errors: errors,
+        user: null,
+        title: "Enter Token",
+        user_id: user.id,
+      });
+    });
+  } else {
+    User.findOne(
+      {
+        resetPasswordToken: token,
+        resetPasswordExpires: {
+          $ne: Date.now(),
+        },
+      },
+      function (err, user) {
+        if (err) console.log(err);
 
-    if (errors) {
-        User.findById(id, function (err, user) {
-            if (err) console.log(err);
-            console.log(user._id)
-            res.render('reset', {
-                errors: errors,
-                user: null,
-                title: 'Enter Token',
-                user_id: user.id
-            });
-        });
-    } else {
-        User.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpires: {
-                $ne: Date.now()
-            }
-        }, function (err, user) {
-            if (err)
-                console.log(err);
+        if (!user) {
+          req.flash("danger", "Token is invalid or has expired!");
+          res.redirect("/users/token");
+        } else {
+          if (err) console.log(err);
 
-            if (!user) {
-                req.flash('danger', 'Token is invalid or has expired!');
-                res.redirect('/users/token');
-            } else {
-                if (err)
-                    console.log(err);
-
-                req.flash('success', 'Token verified successfully! Reset your password now!');
-                res.render('reset', {
-                    title: "Reset Password",
-                    user: null,
-                    user_id: user.id
-                });
-            };
-        });
-    }
-
+          req.flash(
+            "success",
+            "Token verified successfully! Reset your password now!"
+          );
+          res.render("reset", {
+            title: "Reset Password",
+            user: null,
+            user_id: user.id,
+          });
+        }
+      }
+    );
+  }
 });
 
 /*
  * GET reset password
  */
-router.get('/reset', function (req, res) {
-
-    res.render('reset', {
-        title: 'Reset Password'
-    });
-
+router.get("/reset", function (req, res) {
+  res.render("reset", {
+    title: "Reset Password",
+  });
 });
 
 /*
  * POST reset password
  */
-router.post('/reset/:id', function (req, res) {
+router.post("/reset/:id", function (req, res) {
+  let password = req.body.password;
+  let password1 = req.body.password1;
 
-    let password = req.body.password;
-    let password1 = req.body.password1;
+  req.checkBody("password", "Password is required!").notEmpty();
+  req.checkBody("password1", "Passwords do not match!").equals(password);
 
-    req.checkBody('password', 'Password is required!').notEmpty();
-    req.checkBody('password1', 'Passwords do not match!').equals(password);
+  let id = req.params.id;
 
-    let id = req.params.id;
+  let errors = req.validationErrors();
 
-    let errors = req.validationErrors();
+  if (errors) {
+    User.findById(id, function (err, user) {
+      if (err) console.log(err);
 
-    if (errors) {
-        User.findById(id, function (err, user) {
+      res.render("reset", {
+        errors: errors,
+        title: "Reset Token",
+        user: null,
+        user_id: user.id,
+      });
+    });
+  } else {
+    User.findById(id, function (err, user) {
+      if (user) {
+        bcrypt.compare(password, user.password, function (err, isMatch) {
+          if (err) console.log(err);
 
+          if (isMatch) {
+            req.flash(
+              "danger",
+              "Password same as old one, use a new one or Login to continue!"
+            );
+            res.render("reset", {
+              title: "Password Reset",
+              user: null,
+              user_id: user.id,
+            });
+          } else {
             if (err) console.log(err);
 
-            res.render('reset', {
-                errors: errors,
-                title: "Reset Token",
-                user: null,
-                user_id: user.id
+            bcrypt.genSalt(10, function (err, salt) {
+              bcrypt.hash(password, salt, function (err, hash) {
+                if (err) console.log(err);
+
+                user.password = hash;
+
+                user.save(function (err) {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    req.flash(
+                      "success",
+                      "Password reset successful. Login to continue!"
+                    );
+                    res.redirect("/users/login");
+                  }
+                });
+              });
             });
-        })
-
-
-    } else {
-        User.findById(id, function (err, user) {
-            if (user) {
-                bcrypt.compare(password, user.password, function (err, isMatch) {
-                    if (err) console.log(err)
-
-                    if (isMatch) {
-                        req.flash('danger', 'Password same as old one, use a new one or Login to continue!');
-                        res.render('reset', {
-                            title: "Password Reset",
-                            user: null,
-                            user_id: user.id
-                        });
-                    } else {
-                        if (err) console.log(err);
-
-                        bcrypt.genSalt(10, function (err, salt) {
-                            bcrypt.hash(password, salt, function (err, hash) {
-                                if (err)
-                                    console.log(err);
-
-                                user.password = hash;
-
-                                user.save(function (err) {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {
-                                        req.flash('success', 'Password reset successful. Login to continue!');
-                                        res.redirect('/users/login')
-                                    }
-                                });
-                            });
-                        });
-
-
-                    }
-
-                })
-            }
+          }
         });
-    }
-
+      }
+    });
+  }
 });
-
 
 /*
  * GET user profile details
  */
-router.get('/:id', function (req, res) {
-    if (!res.locals.user) res.redirect('/users/login');
+router.get("/:id", function (req, res) {
+  if (!res.locals.user) res.redirect("/users/login");
 
-    let userID = req.params.id;
+  let userID = req.params.id;
 
-    User.findById(userID,
+  User.findById(
+    userID,
 
-        function (err, user) {
-            if (err)
-                console.log(err);
+    function (err, user) {
+      if (err) console.log(err);
 
-            res.render('profile', {
-                title: "User Profile",
-                user: user
-            });
-        });
-
+      res.render("profile", {
+        title: "User Profile",
+        user: user,
+      });
+    }
+  );
 });
 
 /*
  * GET edit profile
  */
-router.get('/edit_profile/:id', function (req, res) {
+router.get("/edit_profile/:id", function (req, res) {
+  if (!res.locals.user) res.redirect("/users/login");
+  let userID = req.params.id;
 
-    if (!res.locals.user) res.redirect('/users/login');
-    let userID = req.params.id;
+  User.findById(
+    userID,
 
-    User.findById(userID,
+    function (err, user) {
+      if (err) console.log(err);
 
-        function (err, user) {
-            if (err)
-                console.log(err);
-
-            res.render('edit_profile', {
-                title: "Edit User Profile",
-                user: user
-            });
-        });
-
+      res.render("edit_profile", {
+        title: "Edit User Profile",
+        user: user,
+      });
+    }
+  );
 });
-
 
 /*
  * POST edit profile
  */
-router.post('/edit_profile/:id', function (req, res) {
-    let name = req.body.name;
-    let email = req.body.email;
-    let username = req.body.username;
-    let number = req.body.number;
-    let address = req.body.address;
+router.post("/edit_profile/:id", function (req, res) {
+  let name = req.body.name;
+  let email = req.body.email;
+  let username = req.body.username;
+  let number = req.body.number;
+  let address = req.body.address;
 
-    req.checkBody('name', 'Name is required!').notEmpty();
-    req.checkBody('email', 'Email is required!').isEmail();
-    req.checkBody('username', 'Username is required!').notEmpty();
-    req.checkBody('number', 'Phone number is required!').notEmpty();
-    req.checkBody('address', 'Billing Address is required!').notEmpty();
+  req.checkBody("name", "Name is required!").notEmpty();
+  req.checkBody("email", "Email is required!").isEmail();
+  req.checkBody("username", "Username is required!").notEmpty();
+  req.checkBody("number", "Phone number is required!").notEmpty();
+  req.checkBody("address", "Billing Address is required!").notEmpty();
 
+  email = email.replace(/\s+/g, "-").toLowerCase();
 
-    email = email.replace(/\s+/g, '-').toLowerCase();
+  let id = req.params.id;
 
-    let id = req.params.id;
+  let errors = req.validationErrors();
 
-    let errors = req.validationErrors();
-
-    if (errors) {
-        res.render('users/edit_profile/' + id, {
-            errors: errors,
+  if (errors) {
+    res.render("users/edit_profile/" + id, {
+      errors: errors,
+      title: "Edit Profile",
+      id: id,
+    });
+  } else {
+    User.findOne(
+      {
+        username: username,
+        _id: {
+          $ne: id,
+        },
+      },
+      function (err, user) {
+        if (user) {
+          req.flash("danger", "Username exists, choose another.");
+          res.render("users/edit_profile/" + id, {
             title: "Edit Profile",
-            id: id
-        });
-    } else {
-        User.findOne({
-            username: username,
-            _id: {
-                '$ne': id
-            }
-        }, function (err, user) {
-            if (user) {
-                req.flash('danger', 'Username exists, choose another.');
-                res.render('users/edit_profile/' + id, {
-                    title: "Edit Profile",
-                    id: id
-                });
-            } else {
+            id: id,
+          });
+        } else {
+          User.findById(id, function (err, user) {
+            if (err) return console.log(err);
 
-                User.findById(id, function (err, user) {
-                    if (err)
-                        return console.log(err);
+            user.name = name;
+            user.email = email;
+            user.username = username;
+            user.number = number;
+            user.address = address;
 
-                    user.name = name;
-                    user.email = email;
-                    user.username = username;
-                    user.number = number;
-                    user.address = address;
+            user.save(function (err) {
+              if (err) return console.log(err);
 
-                    user.save(function (err) {
-                        if (err)
-                            return console.log(err);
+              User.find(function (err, user) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  req.app.locals.user = user;
+                }
+              });
 
-                        User.find(function (err, user) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                req.app.locals.user = user;
-                            }
-                        });
-
-
-                        req.flash('success', 'Profile edited!');
-                        res.redirect('/users/' + id);
-                    });
-
-                });
-
-
-            }
-        });
-    }
-
+              req.flash("success", "Profile edited!");
+              res.redirect("/users/" + id);
+            });
+          });
+        }
+      }
+    );
+  }
 });
-
 
 /*
  * POST change password
  */
-router.post('/password/:id', function (req, res) {
+router.post("/password/:id", function (req, res) {
+  let password = req.body.password;
+  let password1 = req.body.password1;
+  let password2 = req.body.password2;
 
-    let password = req.body.password;
-    let password1 = req.body.password1;
-    let password2 = req.body.password2;
+  req.checkBody("password", "Please enter your old password!").notEmpty();
+  req.checkBody("password2", "Passwords do not match!").equals(password1);
 
-    req.checkBody('password', 'Please enter your old password!').notEmpty();
-    req.checkBody('password2', 'Passwords do not match!').equals(password1);
+  let id = req.params.id;
 
-    let id = req.params.id;
+  let errors = req.validationErrors();
 
-    let errors = req.validationErrors();
+  if (errors) {
+    User.findById(id, function (err, user) {
+      if (err) console.log(err);
 
-    if (errors) {
-        User.findById(id, function (err, user) {
+      res.render("profile", {
+        errors: errors,
+        title: "Profile",
+        user: user,
+      });
+    });
+  } else {
+    User.findById(id, function (err, user) {
+      if (user) {
+        bcrypt.compare(password, user.password, function (err, isMatch) {
+          if (err) console.log(err);
 
-            if (err) console.log(err);
+          if (isMatch) {
+            bcrypt.compare(password1, user.password, function (err, isMatch) {
+              if (err) console.log(err);
 
-            res.render('profile', {
-                errors: errors,
-                title: "Profile",
-                user: user
-            });
-        })
+              if (isMatch) {
+                req.flash(
+                  "danger",
+                  "New Password same as old one, use a new one!"
+                );
+                res.render("profile", {
+                  errors: errors,
+                  title: "Profile",
+                  user: user,
+                });
+              } else {
+                if (err) console.log(err);
 
-    } else {
-        User.findById(id, function (err, user) {
-            if (user) {
-                bcrypt.compare(password, user.password, function (err, isMatch) {
+                bcrypt.genSalt(10, function (err, salt) {
+                  bcrypt.hash(password1, salt, function (err, hash) {
                     if (err) console.log(err);
 
-                    if (isMatch) {
-                        bcrypt.compare(password1, user.password, function (err, isMatch) {
-                            if (err) console.log(err);
+                    user.password = hash;
 
-                            if (isMatch) {
-                                req.flash('danger', 'New Password same as old one, use a new one!');
-                                res.render('profile', {
-                                    errors: errors,
-                                    title: "Profile",
-                                    user: user
-                                });
-                            } else {
-                                if (err) console.log(err);
+                    user.save(function (err) {
+                      if (err) console.log(err);
 
-                                bcrypt.genSalt(10, function (err, salt) {
-                                    bcrypt.hash(password1, salt, function (err, hash) {
-                                        if (err)
-                                            console.log(err);
+                      req.logout();
 
-                                        user.password = hash;
+                      req.flash(
+                        "success",
+                        "Password change successful. Login to continue!"
+                      );
+                      res.redirect("/users/login");
+                    });
+                  });
+                });
+              }
+            });
+          } else {
+            if (err) console.log(err);
 
-                                        user.save(function (err) {
-                                            if (err) console.log(err);
-
-                                            req.logout();
-
-                                            req.flash('success', 'Password change successful. Login to continue!');
-                                            res.redirect('/users/login')
-
-                                        });
-                                    });
-                                });
-
-
-                            }
-                        })
-
-                    } else {
-                        if (err) console.log(err);
-
-                        req.flash('danger', 'Old Password entered does not match your account. Please enter the correct one.');
-                        res.render('edit_profile', {
-                            errors: errors,
-                            title: "Edit Profile",
-                            user: user
-                        });
-                    }
-
-                })
-            }
+            req.flash(
+              "danger",
+              "Old Password entered does not match your account. Please enter the correct one."
+            );
+            res.render("edit_profile", {
+              errors: errors,
+              title: "Edit Profile",
+              user: user,
+            });
+          }
         });
-    }
-
+      }
+    });
+  }
 });
-
-
-
-
 
 // Exports
 module.exports = router;

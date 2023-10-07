@@ -32,6 +32,7 @@ let OrderSchema = mongoose.Schema({
         payerId: String,
         paymentId: String,
         reference: String,
+        transactionId: String,
         discount: String
     },
     isPaid: {

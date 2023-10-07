@@ -192,15 +192,15 @@ router.post('/checkout', function (req, res) {
     let ref = req.body.ref;
     let buf = crypto.randomBytes(8);
 
-    let new_ref = ref + buf.toString('hex')
+    let transactionId = buf.toString('hex')
 
     let params = JSON.stringify({
         "email": req.body.email,
         "amount": req.body.total * 100,
         "currency": "GHS",
-        "reference": new_ref,
+        "reference": transactionId,
         "channels": ['card', 'mobile_money'],
-        "callback_url": 'https://elisales.herokuapp.com/cart/payment-complete'
+        "callback_url": 'https://slickpicks.netlify.app/cart/payment-complete'
     })
 
     let options = {
@@ -211,7 +211,7 @@ router.post('/checkout', function (req, res) {
         }
     }
     // this is to create an incomplete order. 
-    // Move this to the paymwnt-complete GET request and change isPaid to true to make a complete order and also add transaction date to paidAt
+    // Move this to the payment-complete GET request and change isPaid to true to make a complete order and also add transaction date to paidAt
     let order = new Order({
         user: req.user,
         cart: req.session.cart,
@@ -226,29 +226,17 @@ router.post('/checkout', function (req, res) {
             postalCode: req.body.city
         },
         payment: {
-            paymentMethod: 'mobile_money',
-            payerId: 12345,
-            paymentId: new_ref,
+            paymentMethod: null,
+            payerId: null,
+            paymentId: null,
             reference: ref,
+            transactionId: transactionId,
             discount: req.body.discount
         }
     });
     order.save(function (err) {
         if (err) throw err;
     })
-
-
-    if (typeof req.session.ref == "undefined") {
-        req.session.ref = [];
-        req.session.ref.push({
-            ref: new_ref
-        });
-    } else {
-        req.session.ref.push({
-            ref: new_ref
-        });
-    }
-
 
     axios.post('https://api.paystack.co/transaction/initialize', params, options)
         .then(function (response) {
@@ -260,19 +248,10 @@ router.post('/checkout', function (req, res) {
 
 });
 
-/*
- * GET payment complete page
- */
-// router.get('/payment-complete', async function (req, res) {
-//     if (err) console.log(err);
-//     res.render('payment_complete', {
-//         title: "Payment Complete"
-//     });
-// });
-/*
- * GET payment complete page
- */
 
+/*
+ * GET payment complete page
+ */
 router.get('/payment-complete', async function (req, res) {
     console.log(req.query)
     let ref = req.query.reference;
@@ -296,12 +275,12 @@ let config = {
                         req.flash('danger', 'Order update failed!');
                         res.redirect('/cart/payment_failed');
                     }else{
-                        let paymentId = response.data.data.id;
-                        let payerId = response.data.data.customer.id;
-                        order.payment.paymentId = paymentId;
-                        order.payment.payerId = payerId;
+                        order.payment.paymentMethod= response.data.data.channel,
+                        order.payment.paymentId = response.data.data.id;
+                        order.payment.payerId = response.data.data.customer.id;
                         order.isPaid = "true";
-                        order.payment.reference = response.data.data.reference;
+                        order.paidAt = response.data.data.date;
+                        order.payment.transactionId = response.data.data.reference;
 
                         order.save(function(err){
                             if (err){

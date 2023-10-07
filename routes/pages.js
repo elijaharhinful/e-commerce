@@ -17,7 +17,7 @@ let User = require('../models/user');
 let Analytics = require('../models/analytics');
 
 /*
- * GET /
+ * GET / or homepage
  */
 router.get('/', function (req, res) {
     Analytics.findOneAndUpdate(
@@ -29,7 +29,7 @@ router.get('/', function (req, res) {
             }, function (err, page) {
                 if (err)
                     console.log(err);
-        
+                    
                     let perPage = 12;
                     let pageNumber = (req.query.page == null) ? 1 : req.query.page;
                     let startFrom = (pageNumber - 1) * perPage;
@@ -73,7 +73,7 @@ router.get('/', function (req, res) {
                             Product.count().exec(function (err, count) {
                                 if (err) console.log(err);
                                 let pagesNeeded = Math.ceil(count / perPage);
-                                
+
                                 res.render('index', {
                                     title: page.title,
                                     content: page.content,

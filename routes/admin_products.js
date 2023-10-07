@@ -46,6 +46,7 @@ router.get('/add-product', isAdmin, function (req, res) {
 
     let title = "";
     let desc = "";
+    let initialPrice = "";
     let price = "";
     let quantity = "";
 
@@ -54,6 +55,7 @@ router.get('/add-product', isAdmin, function (req, res) {
             title: title,
             desc: desc,
             categories: categories,
+            initialPrice: initialPrice,
             price: price,
             quantity: quantity
         });
@@ -77,6 +79,7 @@ router.post('/add-product',  function (req, res) {
 
     req.checkBody('title', 'Title must have a value.').notEmpty();
     req.checkBody('desc', 'Description must have a value.').notEmpty();
+    req.checkBody('initialPrice', 'Initial price must have a value.').isDecimal();
     req.checkBody('price', 'Price must have a value.').isDecimal();
     req.checkBody('image', 'You must upload an image').isImage(imageFile);
 
@@ -84,6 +87,7 @@ router.post('/add-product',  function (req, res) {
     let slug = title.replace(/\s+/g, '-').toLowerCase();
     let desc = req.body.desc;
     let price = req.body.price;
+    let initialPrice = req.body.initialPrice;
     let quantity = req.body.quantity;
     let category = req.body.category;
 
@@ -96,6 +100,7 @@ router.post('/add-product',  function (req, res) {
                 title: title,
                 desc: desc,
                 categories: categories,
+                initialPrice: initialPrice,
                 price: price,
                 quantity: quantity
             });
@@ -109,6 +114,7 @@ router.post('/add-product',  function (req, res) {
                         title: title,
                         desc: desc,
                         categories: categories,
+                        initialPrice: initialPrice,
                         price: price,
                         quantity: quantity
                     });
@@ -116,11 +122,13 @@ router.post('/add-product',  function (req, res) {
             } else {
 
                 let price2 = parseFloat(price).toFixed(2);
+                let initialPrice2 = parseFloat(initialPrice).toFixed(2);
 
                 let product = new Product({
                     title: title,
                     slug: slug,
                     desc: desc,
+                    initialPrice: initialPrice2,
                     price: price2,
                     category: category,
                     quantity: quantity,
@@ -194,6 +202,7 @@ router.get('/edit-product/:id', isAdmin, function (req, res) {
                             desc: p.desc,
                             categories: categories,
                             category: p.category.replace(/\s+/g, '-').toLowerCase(),
+                            initialPrice: parseFloat(p.initialPrice).toFixed(2),
                             price: parseFloat(p.price).toFixed(2),
                             quantity: p.quantity,
                             image: p.image,
@@ -224,12 +233,14 @@ router.post('/edit-product/:id', function (req, res) {
 
     req.checkBody('title', 'Title must have a value.').notEmpty();
     req.checkBody('desc', 'Description must have a value.').notEmpty();
+    req.checkBody('initialPrice', 'Initial price must have a value.').isDecimal();
     req.checkBody('price', 'Price must have a value.').isDecimal();
     req.checkBody('image', 'You must upload an image').isImage(imageFile);
 
     let title = req.body.title;
     let slug = title.replace(/\s+/g, '-').toLowerCase();
     let desc = req.body.desc;
+    let initialPrice = req.body.initialPrice;
     let price = req.body.price;
     let quantity = req.body.quantity;
     let category = req.body.category;
@@ -257,6 +268,7 @@ router.post('/edit-product/:id', function (req, res) {
                     p.title = title;
                     p.slug = slug;
                     p.desc = desc;
+                    p.initialPrice = parseFloat(initialPrice).toFixed(2);
                     p.price = parseFloat(price).toFixed(2);
                     p.quantity = quantity;
                     p.category = category;

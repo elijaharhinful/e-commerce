@@ -160,7 +160,6 @@ app.use(passport.session());
 app.get('*', function(req,res,next) {
   res.locals.cart = req.session.cart;
   res.locals.user = req.user || null;
-  res.locals.ref = req.session.ref
   next();
 });
 
@@ -203,7 +202,7 @@ const adminOther = require('./routes/admin_other.js');
 // const adminAnalytics = require('./routes/analytics.js');
 
 
-
+//use routes
 app.use('/admin/dashboard', adminPages);
 app.use('/admin/dashboard', adminCategories);
 app.use('/admin/dashboard', adminProducts);
