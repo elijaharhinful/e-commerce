@@ -200,7 +200,7 @@ router.post('/checkout', function (req, res) {
         "currency": "GHS",
         "reference": transactionId,
         "channels": ['card', 'mobile_money'],
-        "callback_url": 'https://slickpicks.netlify.app/cart/payment-complete'
+        "callback_url": 'https://slickpicks.vercel.app/cart/payment-complete'
     })
 
     let options = {
